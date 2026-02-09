@@ -1,34 +1,62 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Uploaded Requests</title>
+    <title>AgriMentor | Requests</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
-<h2>Uploaded Image Requests</h2>
+    <div class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo-image.png') }}" alt="AgriMentor Logo">
+        </div>
 
-<table border="1" cellpadding="10">
-    <tr>
-        <th>ID</th>
-        <th>Image Name</th>
-        <th>Upload Time</th>
-        <th>Status</th>
-    </tr>
-
-    {% for row in uploads %}
-<tr>
-    <td>{{ row[0] }}</td>
-    <td>{{ row[1] }}</td>
-    <td>{{ row[2] }}</td>
-    <td>{{ row[3] }}</td>
-    <td>
-        <a href="/verify/{{ row[0] }}">Verify</a>
-    </td>
-</tr>
-{% endfor %}
+        <div class="nav-actions">
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
 
 
-</table>
+    <div class="container">
+        <div class="card" style="width: 90%; max-width: 900px;">
+            <h2>Uploaded Requests</h2>
+            <p class="subtitle">Review and verify uploaded crop or soil images</p>
+
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Image Name</th>
+                    <th>Uploaded At</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+
+                {% for row in uploads %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>
+                        <span class="status {{ row[3] }}">
+                            {{ row[3] }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if row[3] == 'pending' %}
+                        <a class="btn-small" href="/verify/{{ row[0] }}">Verify</a>
+                        {% else %}
+                        <span class="verified-text">Verified</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+
+        </div>
+    </div>
 
 </body>
+
 </html>

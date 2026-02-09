@@ -4,7 +4,8 @@ from flask import Flask, render_template, request
 import os
 import mysql.connector
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
+
 app.secret_key = "agrimentor_secret"
 
 
@@ -83,6 +84,11 @@ def login():
             return "Admin logged in"
     else:
         return "Invalid login"
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login_page'))
 
 
 if __name__ == '__main__':

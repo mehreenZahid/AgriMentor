@@ -1,17 +1,44 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>AgriMentor | Upload Image</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
+    <div class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo-image.png') }}" alt="AgriMentor Logo">
+        </div>
 
-    <h2>Upload Crop or Soil Image</h2>
+        <div class="nav-actions">
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
 
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="file" name="image" required>
-        <br><br>
-        <button type="submit">Upload</button>
-    </form>
+
+
+    <div class="container">
+        <div class="card">
+            <h2>Upload Crop / Soil Image</h2>
+            <p class="subtitle">
+                Upload a clear image for disease detection or crop recommendation
+            </p>
+
+
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <label class="file-label">
+                    Choose Image
+                    <input type="file" name="image" required hidden>
+                </label>
+                <p class="file-hint">Accepted formats: JPG, PNG</p>
+
+                <button type="submit">Upload Image</button>
+            </form>
+        </div>
+    </div>
 
 </body>
+
 </html>
