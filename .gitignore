@@ -1,4 +1,5 @@
 ml/dataset/
+*.h5
 uploads/
 venv/
 __pycache__/
