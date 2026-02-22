@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AgriMentor Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+        <h2>AgriMentor</h2>
+
+        <ul>
+
+            {% if session.get('role') == 'farmer' %}
+                <li><a href="{{ url_for('farmer.farmer_dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('main.upload') }}">Upload Crop</a></li>
+                <li><a href="{{ url_for('farmer.history') }}">History</a></li>
+                <li><a href="{{ url_for('main.schemes') }}">Browse Schemes</a></li>
+                <li><a href="{{ url_for('farmer.profile') }}">Profile</a></li>
+
+            {% elif session.get('role') == 'expert' %}
+                <li><a href="{{ url_for('expert.expert_dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('expert.review_cases') }}">Review Predictions</a></li>
+                <li><a href="{{ url_for('expert.manage_schemes') }}">Manage Schemes</a></li>
+                <li><a href="{{ url_for('expert.profile') }}">Profile</a></li>
+            {% endif %}
+
+            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            Welcome, {{ session.get('username') }}
+        </div>
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

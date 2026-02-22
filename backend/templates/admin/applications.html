@@ -1,0 +1,29 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block dashboard_content %}
+
+<h1>Applications</h1>
+
+<table>
+<tr>
+    <th>Farmer</th>
+    <th>Scheme</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+
+{% for app in applications %}
+<tr>
+    <td>{{ app.farmer_name }}</td>
+    <td>{{ app.title }}</td>
+    <td>{{ app.status }}</td>
+    <td>
+        <a href="/admin/application/{{ app.id }}/approved">Approve</a> |
+        <a href="/admin/application/{{ app.id }}/rejected">Reject</a>
+    </td>
+</tr>
+{% endfor %}
+
+</table>
+
+{% endblock %}

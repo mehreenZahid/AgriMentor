@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            AgriMentor
+        </div>
+
+        <nav class="sidebar-nav">
+
+    {% if current_user.role == "farmer" %}
+        <a href="/farmer">Overview</a>
+        <a href="/farmer/upload">AI Diagnosis</a>
+        <a href="/farmer/history">Prediction History</a>
+        <a href="/farmer/schemes">Schemes</a>
+        <a href="/farmer/applications">My Applications</a>
+        <a href="/farmer/profile">Profile</a>
+    {% endif %}
+
+    {% if current_user.role == "expert" %}
+        <a href="/admin">Overview</a>
+        <a href="/admin/schemes">Manage Schemes</a>
+        <a href="/admin/applications">Applications</a>
+        <a href="/admin/farmers">Farmers</a>
+        <a href="/admin/analytics">Analytics</a>
+    {% endif %}
+
+    <a href="{{ url_for('auth.logout') }}">Logout</a>
+
+</nav>
+    </aside>
+
+    <main class="dashboard-content">
+        {% block dashboard_content %}{% endblock %}
+    </main>
+
+</div>
+
+</body>
+</html>

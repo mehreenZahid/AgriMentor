@@ -1,22 +1,43 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>AgriMentor | Login</title>
+    <title>Login | AgriMentor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
-<div class="container">
-    <div class="card">
-        <h2>Login</h2>
+    <div class="container">
+        <div class="card">
+            <h2>Login</h2>
 
-        <form action="/login" method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
+            <!-- LOGIN FORM -->
+            <form method="POST" action="{{ url_for('auth.login_page') }}">
+
+                <input type="email" name="email" placeholder="Email" required>
+
+                <input type="password" name="password" placeholder="Password" required>
+
+                <button type="submit">Login</button>
+
+            </form>
+
+            <!-- GOOGLE LOGIN BUTTON -->
+            <div style="margin-top: 15px;">
+                <a href="{{ url_for('auth.google_login') }}">
+                    <button type="button">Login with Google</button>
+                </a>
+            </div>
+
+            <p style="margin-top:15px;">
+                Don’t have an account?
+                <a href="{{ url_for('auth.register_page') }}">Register here</a>
+            </p>
+
+        </div>
     </div>
-</div>
 
 </body>
+
 </html>

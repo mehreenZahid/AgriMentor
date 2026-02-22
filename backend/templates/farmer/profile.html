@@ -1,0 +1,21 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block dashboard_content %}
+
+<h1>My Profile</h1>
+
+<form method="POST">
+
+    <label>Name</label>
+    <input type="text" name="name" value="{{ user.name }}">
+
+    <label>Email</label>
+    <input type="text" value="{{ user.email }}" disabled>
+
+    <button type="submit">Update Profile</button>
+
+</form>
+
+{% endblock %}

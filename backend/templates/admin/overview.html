@@ -1,0 +1,24 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block dashboard_content %}
+
+<h1>Admin Overview</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total Farmers</h3>
+        <p>{{ total_farmers }}</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Total Schemes</h3>
+        <p>{{ total_schemes }}</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Total Applications</h3>
+        <p>{{ total_applications }}</p>
+    </div>
+</div>
+
+{% endblock %}
