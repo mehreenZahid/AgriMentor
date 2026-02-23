@@ -187,6 +187,114 @@ def expert_dashboard():
 )
 
 
+# ---------------------------------------------------
+# USER-FACING DASHBOARD & PAGES (FARMER)
+# ---------------------------------------------------
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+
+    if current_user.role != "farmer":
+        # Experts keep using the existing expert dashboard
+        return redirect(url_for("expert_dashboard"))
+
+    # Recent predictions (global for now, not per-user)
+    cursor.execute(
+        """
+        SELECT image_name, upload_time, predicted_class, confidence
+        FROM uploads
+        ORDER BY upload_time DESC
+        LIMIT 5
+        """
+    )
+    recent_predictions = cursor.fetchall()
+
+    # Agricultural schemes (if table exists)
+    schemes = []
+    try:
+        cursor.execute(
+            """
+            SELECT title, description, eligibility, benefits, deadline, status
+            FROM schemes
+            ORDER BY deadline ASC
+            LIMIT 5
+            """
+        )
+        schemes = cursor.fetchall()
+    except mysql.connector.Error:
+        schemes = []
+
+    return render_template(
+        "dashboard.html",
+        recent_predictions=recent_predictions,
+        schemes=schemes,
+    )
+
+
+@app.route("/predict")
+@login_required
+def predict_entry():
+
+    if current_user.role != "farmer":
+        abort(403)
+
+    # Reuse the existing upload dashboard at /farmer
+    return redirect(url_for("farmer_dashboard"))
+
+
+@app.route("/history")
+@login_required
+def history():
+
+    if current_user.role != "farmer":
+        abort(403)
+
+    cursor.execute(
+        """
+        SELECT image_name, upload_time, predicted_class, confidence
+        FROM uploads
+        ORDER BY upload_time DESC
+        LIMIT 50
+        """
+    )
+    predictions = cursor.fetchall()
+
+    return render_template("history.html", predictions=predictions)
+
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+
+    if current_user.role != "farmer":
+        abort(403)
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        if name:
+            cursor.execute(
+                "UPDATE users SET name = %s WHERE id = %s",
+                (name, current_user.id),
+            )
+            db.commit()
+            current_user.name = name
+
+    return render_template("profile.html", user=current_user)
+
+
+@app.route("/community")
+@login_required
+def community():
+    return render_template("community.html")
+
+
+@app.route("/support")
+@login_required
+def support():
+    return render_template("support.html")
+
+
 
 # ---------------------------------------------------
 # USER LOADER (IMPORTANT FOR FLASK-LOGIN)
@@ -199,14 +307,6 @@ def load_user(user_id):
     return User.get_by_id(user_id)
 
 # ---------------------------------------------------
-
-from dashboards.farmer import farmer
-from dashboards.expert import expert
-
-app.register_blueprint(farmer)
-app.register_blueprint(expert)
-
-
 
 app.google = google
 

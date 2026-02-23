@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}AgriMentor Dashboard{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="shell-nav">
+    <div class="shell-nav-left">
+        <div class="shell-nav-logo">
+            <span class="shell-logo-mark">🌾</span>
+            <span class="shell-logo-text">AgriMentor</span>
+        </div>
+    </div>
+
+    <nav class="shell-nav-center">
+        {% if current_user.is_authenticated %}
+            {% if current_user.role == "farmer" %}
+                <a href="{{ url_for('dashboard') }}">Home</a>
+                <a href="{{ url_for('predict_entry') }}">Predict</a>
+                <a href="{{ url_for('history') }}">History</a>
+                <a href="{{ url_for('community') }}">Community</a>
+                <a href="{{ url_for('support') }}">Support</a>
+                <a href="{{ url_for('profile') }}">Profile</a>
+            {% elif current_user.role == "expert" %}
+                <a href="{{ url_for('expert_dashboard') }}">Home</a>
+                <a href="{{ url_for('expert_dashboard') }}">Analytics</a>
+                <a href="{{ url_for('support') }}">Support</a>
+            {% endif %}
+        {% else %}
+            <a href="{{ url_for('auth.login_page') }}">Home</a>
+            <a href="{{ url_for('auth.login_page') }}">Predict</a>
+            <a href="{{ url_for('auth.login_page') }}">History</a>
+            <a href="{{ url_for('community') }}">Community</a>
+            <a href="{{ url_for('support') }}">Support</a>
+        {% endif %}
+    </nav>
+
+    <div class="shell-nav-right">
+        {% if current_user.is_authenticated %}
+            <span class="shell-user-chip">
+                {{ current_user.name or current_user.email }}
+            </span>
+            <a href="{{ url_for('auth.logout') }}" class="shell-nav-button">Logout</a>
+        {% else %}
+            <a href="{{ url_for('auth.login_page') }}" class="shell-nav-link">Login</a>
+            <a href="{{ url_for('auth.register_page') }}" class="shell-nav-button">Get started</a>
+        {% endif %}
+    </div>
+</header>
+
+<main class="shell-main">
+    {% if current_user.is_authenticated %}
+        <div class="shell-main-grid">
+            <aside class="shell-sidebar">
+                {% if current_user.role == "farmer" %}
+                    <div class="shell-sidebar-title">Farmer workspace</div>
+                    <a href="{{ url_for('dashboard') }}">Overview</a>
+                    <a href="{{ url_for('predict_entry') }}">Predict</a>
+                    <a href="{{ url_for('history') }}">History</a>
+                    <a href="{{ url_for('community') }}">Community</a>
+                    <a href="{{ url_for('support') }}">Support</a>
+                    <a href="{{ url_for('profile') }}">Profile</a>
+                {% elif current_user.role == "expert" %}
+                    <div class="shell-sidebar-title">Expert workspace</div>
+                    <a href="{{ url_for('expert_dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('support') }}">Support</a>
+                {% endif %}
+            </aside>
+
+            <div class="shell-main-content">
+    {% else %}
+            <div class="shell-main-content">
+    {% endif %}
+
+                {% block page_content %}{% endblock %}
+
+            </div>
+
+    {% if current_user.is_authenticated %}
+        </div>
+    {% endif %}
+</main>
+
+<footer class="shell-footer">
+    <div class="shell-footer-grid">
+        <div>
+            <h4>AgriMentor</h4>
+            <p>AI-powered insights for resilient farming.</p>
+        </div>
+        <div>
+            <h4>Contact</h4>
+            <p>Email: support@agrimentor.com</p>
+            <p>Phone: +91-00000-00000</p>
+        </div>
+        <div>
+            <h4>Links</h4>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a><br>
+            <a href="{{ url_for('support') }}">Support</a><br>
+            <a href="{{ url_for('community') }}">Community</a>
+        </div>
+    </div>
+    <div class="shell-footer-bottom">
+        © {{ 2026 }} AgriMentor. All rights reserved.
+    </div>
+</footer>
+
+</body>
+</html>
+

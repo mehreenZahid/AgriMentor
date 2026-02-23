@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}Profile | AgriMentor{% endblock %}
+
+{% block page_content %}
+<section class="shell-page-header">
+    <div>
+        <h1>Your profile</h1>
+        <p>Manage your basic account information.</p>
+    </div>
+</section>
+
+<section class="shell-card shell-card-narrow">
+    <form method="POST" class="shell-form">
+        <label>
+            <span>Name</span>
+            <input type="text" name="name" value="{{ user.name }}" required>
+        </label>
+
+        <label>
+            <span>Email</span>
+            <input type="email" value="{{ user.email }}" disabled>
+        </label>
+
+        <label>
+            <span>Role</span>
+            <input type="text" value="{{ user.role }}" disabled>
+        </label>
+
+        <button type="submit" class="shell-btn shell-btn-primary">Save changes</button>
+    </form>
+</section>
+{% endblock %}

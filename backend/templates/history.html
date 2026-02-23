@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}Prediction History | AgriMentor{% endblock %}
+
+{% block page_content %}
+<section class="shell-page-header">
+    <div>
+        <h1>Prediction history</h1>
+        <p>Recent predictions across uploaded crop and soil images.</p>
+    </div>
+</section>
+
+<section class="shell-card shell-card-full">
+    {% if predictions %}
+        <table class="shell-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Prediction</th>
+                    <th>Confidence</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in predictions %}
+                <tr>
+                    <td>{{ row.image_name }}</td>
+                    <td>{{ row.predicted_class }}</td>
+                    <td>{{ row.confidence }}%</td>
+                    <td>{{ row.upload_time }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="shell-empty-state">
+            No predictions found yet. Start by uploading an image from the Predict page.
+        </p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard | AgriMentor{% endblock %}
+
+{% block page_content %}
+<section class="shell-hero">
+    <div class="shell-hero-main">
+        <h1>Welcome back, {{ current_user.name or "Farmer" }}.</h1>
+        <p>Track your crop health, review predictions, and discover schemes that support your farm.</p>
+        <div class="shell-hero-actions">
+            <a href="{{ url_for('predict_entry') }}" class="shell-btn shell-btn-primary">Predict now</a>
+            <a href="{{ url_for('history') }}" class="shell-btn shell-btn-ghost">View history</a>
+        </div>
+    </div>
+    <div class="shell-hero-side">
+        <div class="shell-hero-card">
+            <p class="shell-hero-stat-label">Latest prediction</p>
+            {% if recent_predictions %}
+                {% set last = recent_predictions[0] %}
+                <p class="shell-hero-stat-value">{{ last.predicted_class }}</p>
+                <p class="shell-hero-stat-sub">Confidence: {{ last.confidence }}%</p>
+                <p class="shell-hero-stat-sub">On {{ last.upload_time }}</p>
+            {% else %}
+                <p class="shell-hero-empty">No predictions yet. Start by uploading an image.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="shell-section-grid">
+    <div class="shell-card">
+        <div class="shell-card-header">
+            <h2>Quick actions</h2>
+            <span class="shell-pill">Farmer tools</span>
+        </div>
+        <ul class="shell-list">
+            <li><a href="{{ url_for('predict_entry') }}">Upload crop / soil image</a></li>
+            <li><a href="{{ url_for('history') }}">Review recent predictions</a></li>
+            <li><a href="{{ url_for('profile') }}">Update your profile</a></li>
+        </ul>
+    </div>
+
+    <div class="shell-card">
+        <div class="shell-card-header">
+            <h2>Prediction history</h2>
+        </div>
+        {% if recent_predictions %}
+            <table class="shell-table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Prediction</th>
+                        <th>Confidence</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in recent_predictions %}
+                    <tr>
+                        <td>{{ row.image_name }}</td>
+                        <td>{{ row.predicted_class }}</td>
+                        <td>{{ row.confidence }}%</td>
+                        <td>{{ row.upload_time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="shell-card-footer">
+                <a href="{{ url_for('history') }}">View full history →</a>
+            </div>
+        {% else %}
+            <p class="shell-empty-state">
+                No predictions to show yet. Try uploading your first image.
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="shell-card">
+        <div class="shell-card-header">
+            <h2>Agricultural schemes</h2>
+            <span class="shell-pill shell-pill-soft">Govt.</span>
+        </div>
+        {% if schemes %}
+            <ul class="shell-list">
+                {% for s in schemes %}
+                <li>
+                    <div class="shell-scheme-title">{{ s.title }}</div>
+                    <div class="shell-scheme-meta">
+                        <span>Status: {{ s.status }}</span>
+                        {% if s.deadline %}
+                            <span>Deadline: {{ s.deadline }}</span>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="shell-empty-state">
+                Schemes data is not available yet. This section will list relevant government schemes once configured.
+            </p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

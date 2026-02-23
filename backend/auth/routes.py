@@ -22,7 +22,7 @@ bcrypt = Bcrypt()
 def root():
     if current_user.is_authenticated:
         if current_user.role == "farmer":
-            return redirect(url_for("farmer_dashboard"))
+            return redirect(url_for("dashboard"))
         else:
             return redirect(url_for("expert_dashboard"))
     return redirect(url_for("auth.login_page"))
@@ -89,7 +89,7 @@ def login_page():
 
             # ROLE-BASED REDIRECT (same as Google login: app routes at /farmer, /expert)
             if user.role == "farmer":
-                return redirect(url_for("farmer_dashboard"))
+                return redirect(url_for("dashboard"))
             elif user.role == "expert":
                 return redirect(url_for("expert_dashboard"))
 
@@ -145,6 +145,6 @@ def google_callback():
     login_user(user)
 
     if user.role == "farmer":
-        return redirect(url_for("farmer_dashboard"))
+        return redirect(url_for("dashboard"))
     else:
         return redirect(url_for("expert_dashboard"))
