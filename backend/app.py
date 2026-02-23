@@ -45,6 +45,54 @@ google = oauth.register(
 
 app.register_blueprint(auth_bp)
 
+
+# ---------------------------------------------------
+# PUBLIC LANDING PAGE
+# ---------------------------------------------------
+
+@app.route("/")
+def index():
+    # If the user is already logged in, keep the existing behaviour
+    # of sending them straight to their dashboard.
+    if current_user.is_authenticated:
+        if current_user.role == "farmer":
+            return redirect(url_for("dashboard"))
+        else:
+            return redirect(url_for("expert_dashboard"))
+
+    # Anonymous users see the marketing / landing page.
+    featured_schemes = []
+    try:
+        cursor.execute(
+            """
+            SELECT
+                id,
+                title,
+                -- Fallback: if eligibility_summary does not exist or is NULL,
+                -- derive a short summary from eligibility/description.
+                COALESCE(eligibility_summary, '') AS eligibility_summary,
+                COALESCE(eligibility, '') AS eligibility,
+                COALESCE(description, '') AS description
+            FROM schemes
+            ORDER BY deadline ASC
+            LIMIT 3
+            """
+        )
+        rows = cursor.fetchall()
+
+        # Ensure each row has a non-empty eligibility_summary
+        for row in rows:
+            if not row.get("eligibility_summary"):
+                base_text = row.get("eligibility") or row.get("description") or ""
+                row["eligibility_summary"] = (base_text[:120] + "…") if base_text else ""
+
+        featured_schemes = rows
+    except mysql.connector.Error:
+        # If the schemes table is missing or errors, fail silently
+        featured_schemes = []
+
+    return render_template("index.html", featured_schemes=featured_schemes)
+
 # ---------------------------------------------------
 # PATH SETUP (ML SAFE)
 # ---------------------------------------------------

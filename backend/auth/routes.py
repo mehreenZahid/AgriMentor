@@ -18,7 +18,7 @@ bcrypt = Bcrypt()
 # ROOT ROUTE
 # ---------------------------------------------------
 
-@auth_bp.route("/")
+@auth_bp.route("/start")
 def root():
     if current_user.is_authenticated:
         if current_user.role == "farmer":

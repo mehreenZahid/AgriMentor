@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AgriMentor – Smart Farming Starts Here</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO basics -->
+  <meta name="description" content="AgriMentor helps Indian farmers detect crop diseases, get crop recommendations, and discover government schemes using simple AI-powered photo uploads.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Landing Page CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+  <header class="am-header">
+    <nav class="am-navbar" aria-label="Main navigation">
+      <div class="am-navbar-inner">
+        <a href="{{ url_for('index') }}" class="am-logo">
+          <span class="am-logo-icon" aria-hidden="true">🌱</span>
+          <span class="am-logo-text">AgriMentor</span>
+        </a>
+
+        <button class="am-nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="am-mobile-menu">
+          <span class="am-nav-toggle-bar"></span>
+          <span class="am-nav-toggle-bar"></span>
+          <span class="am-nav-toggle-bar"></span>
+        </button>
+
+        <div class="am-nav-links">
+          <a href="{{ url_for('index') }}#home" class="am-nav-link">Home</a>
+          <a href="{{ url_for('index') }}#how-it-works" class="am-nav-link">How It Works</a>
+          <a href="{{ url_for('index') }}#features" class="am-nav-link">Features</a>
+          <a href="{{ url_for('index') }}#schemes" class="am-nav-link">Government Schemes</a>
+          <a href="{{ url_for('index') }}#contact" class="am-nav-link">Contact</a>
+        </div>
+
+        <div class="am-nav-cta">
+          <a href="{{ url_for('auth.login_page') }}" class="am-btn am-btn-secondary">Login</a>
+          <a href="{{ url_for('auth.register_page') }}" class="am-btn am-btn-primary">Get Started</a>
+        </div>
+      </div>
+
+      <!-- Mobile overlay menu -->
+      <div id="am-mobile-menu" class="am-mobile-menu" aria-hidden="true">
+        <div class="am-mobile-menu-inner">
+          <a href="{{ url_for('index') }}#home" class="am-mobile-link">Home</a>
+          <a href="{{ url_for('index') }}#how-it-works" class="am-mobile-link">How It Works</a>
+          <a href="{{ url_for('index') }}#features" class="am-mobile-link">Features</a>
+          <a href="{{ url_for('index') }}#schemes" class="am-mobile-link">Government Schemes</a>
+          <a href="{{ url_for('index') }}#contact" class="am-mobile-link">Contact</a>
+          <div class="am-mobile-cta">
+            <a href="{{ url_for('auth.login_page') }}" class="am-btn am-btn-secondary am-mobile-btn">Login</a>
+            <a href="{{ url_for('auth.register_page') }}" class="am-btn am-btn-primary am-mobile-btn">Get Started</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="home" class="am-hero">
+      <div class="am-hero-inner am-container">
+        <div class="am-hero-left">
+          <p class="am-hero-kicker">AI Support for Every Kisan</p>
+          <h1 class="am-hero-title">Smart Farming Starts Here</h1>
+          <p class="am-hero-subtitle">
+            Upload a leaf or soil photo. Get instant AI diagnosis, crop recommendations, and access to government schemes — all in one place.
+          </p>
+
+          <div class="am-hero-cta">
+            <a href="{{ url_for('predict_entry') }}" class="am-btn am-btn-primary am-hero-btn">
+              Detect Crop Disease →
+            </a>
+            <a href="{{ url_for('predict_entry') }}" class="am-btn am-btn-secondary am-hero-btn">
+              Get Crop Recommendation
+            </a>
+          </div>
+
+          <div class="am-hero-trust">
+            <div class="am-trust-item">
+              <span class="am-trust-icon" aria-hidden="true">🌿</span>
+              <span class="am-trust-text">AI-Powered Analysis</span>
+            </div>
+            <div class="am-trust-item">
+              <span class="am-trust-icon" aria-hidden="true">🔒</span>
+              <span class="am-trust-text">Secure &amp; Private</span>
+            </div>
+            <div class="am-trust-item">
+              <span class="am-trust-icon" aria-hidden="true">🏛️</span>
+              <span class="am-trust-text">Government Schemes Included</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="am-hero-right" aria-hidden="true">
+          <div class="am-hero-mockup">
+            <div class="am-mockup-header">
+              <span class="am-mockup-dot"></span>
+              <span class="am-mockup-dot"></span>
+              <span class="am-mockup-dot"></span>
+            </div>
+            <div class="am-mockup-body">
+              <div class="am-mockup-card am-mockup-leaf">
+                <div class="am-mockup-card-header">
+                  <span class="am-mockup-icon">🍃</span>
+                  <span class="am-mockup-title">Leaf Diagnosis</span>
+                  <span class="am-mockup-badge am-badge-live">● Live</span>
+                </div>
+                <p class="am-mockup-result">Tomato Leaf Blight</p>
+                <div class="am-mockup-confidence">
+                  <span>Confidence</span>
+                  <div class="am-mockup-bar">
+                    <div class="am-mockup-bar-fill" style="width: 92%;"></div>
+                  </div>
+                  <span class="am-mockup-score">92%</span>
+                </div>
+                <p class="am-mockup-note">
+                  Suggested: Remove infected leaves, apply recommended fungicide, avoid overhead watering.
+                </p>
+              </div>
+
+              <div class="am-mockup-card am-mockup-soil">
+                <div class="am-mockup-card-header">
+                  <span class="am-mockup-icon">🌱</span>
+                  <span class="am-mockup-title">Soil Recommendation</span>
+                  <span class="am-mockup-badge am-badge-live">● Live</span>
+                </div>
+                <p class="am-mockup-result">Loamy Soil</p>
+                <p class="am-mockup-note">
+                  Best suited crops: Wheat, Rice, Pulses, Vegetables.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="am-section am-how">
+      <div class="am-container">
+        <header class="am-section-header">
+          <h2>Three Steps to Better Farming</h2>
+          <p>Simple, guided steps that any farmer can follow.</p>
+        </header>
+
+        <div class="am-how-steps">
+          <div class="am-how-step">
+            <div class="am-how-circle">1</div>
+            <div class="am-how-icon" aria-hidden="true">📸</div>
+            <h3>Upload Your Photo</h3>
+            <p>Take a clear photo of your crop leaf or soil with any smartphone.</p>
+          </div>
+
+          <div class="am-how-connector" aria-hidden="true">
+            <span class="am-how-line"></span>
+          </div>
+
+          <div class="am-how-step">
+            <div class="am-how-circle">2</div>
+            <div class="am-how-icon" aria-hidden="true">🤖</div>
+            <h3>AI Analyzes Instantly</h3>
+            <p>Our smart model checks the image and understands what it shows in seconds.</p>
+          </div>
+
+          <div class="am-how-connector" aria-hidden="true">
+            <span class="am-how-line"></span>
+          </div>
+
+          <div class="am-how-step">
+            <div class="am-how-circle">3</div>
+            <div class="am-how-icon" aria-hidden="true">📋</div>
+            <h3>Get Actionable Results</h3>
+            <p>See the diagnosis, confidence score, easy treatment steps, or crop suggestions.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CORE FEATURES -->
+    <section id="features" class="am-section am-features">
+      <div class="am-container">
+        <header class="am-section-header">
+          <h2>What AgriMentor Can Do For You</h2>
+          <p>Powered by AI. Built for farmers.</p>
+        </header>
+
+        <div class="am-features-grid">
+          <!-- Live Feature Cards -->
+          <article class="am-feature-card am-feature-live am-feature-leaf">
+            <div class="am-feature-card-top">
+              <div class="am-feature-icon" aria-hidden="true">🍃</div>
+              <span class="am-badge-live">● Live</span>
+            </div>
+            <h3>Crop Disease Detection</h3>
+            <p>
+              Upload a photo of any diseased leaf. AgriMentor quickly identifies the problem and shares simple treatment and prevention steps.
+            </p>
+            <a href="{{ url_for('predict_entry') }}" class="am-feature-link">Try Now →</a>
+          </article>
+
+          <article class="am-feature-card am-feature-live am-feature-soil">
+            <div class="am-feature-card-top">
+              <div class="am-feature-icon" aria-hidden="true">🌱</div>
+              <span class="am-badge-live">● Live</span>
+            </div>
+            <h3>Soil-Based Crop Recommendation</h3>
+            <p>
+              Not sure what to grow? Upload a soil photo and get instant crop ideas matched to your soil type.
+            </p>
+            <a href="{{ url_for('predict_entry') }}" class="am-feature-link">Try Now →</a>
+          </article>
+
+          <article class="am-feature-card am-feature-live am-feature-schemes">
+            <div class="am-feature-card-top">
+              <div class="am-feature-icon" aria-hidden="true">🏛️</div>
+              <span class="am-badge-live">● Live</span>
+            </div>
+            <h3>Government Agricultural Schemes</h3>
+            <p>
+              Browse the latest government schemes, check who can apply, and go directly to the official application links. Updated by admins in real time.
+            </p>
+            <a href="{{ url_for('schemes') }}" class="am-feature-link">Browse Schemes →</a>
+          </article>
+
+          <article class="am-feature-card am-feature-live am-feature-dashboard">
+            <div class="am-feature-card-top">
+              <div class="am-feature-icon" aria-hidden="true">📊</div>
+              <span class="am-badge-live">● Live</span>
+            </div>
+            <h3>Admin Dashboard</h3>
+            <p>
+              A single dashboard to see total farmers onboarded, prediction activity, and full scheme management tools.
+            </p>
+            <a href="{{ url_for('expert_dashboard') }}" class="am-feature-link">Go to Dashboard →</a>
+          </article>
+        </div>
+
+        <!-- Coming Soon Features -->
+        <div class="am-coming-soon">
+          <h3 class="am-coming-title">Coming Soon</h3>
+          <div class="am-coming-grid">
+            <article class="am-feature-card am-feature-soon">
+              <div class="am-feature-card-top">
+                <div class="am-feature-icon" aria-hidden="true">🕐</div>
+                <span class="am-badge-soon">Coming Soon</span>
+              </div>
+              <h3>Prediction History</h3>
+              <p>See a simple timeline of your past leaf and soil checks.</p>
+            </article>
+
+            <article class="am-feature-card am-feature-soon">
+              <div class="am-feature-card-top">
+                <div class="am-feature-icon" aria-hidden="true">🔐</div>
+                <span class="am-badge-soon">Coming Soon</span>
+              </div>
+              <h3>Social Login</h3>
+              <p>Quick login with Google and Facebook, no extra passwords.</p>
+            </article>
+
+            <article class="am-feature-card am-feature-soon">
+              <div class="am-feature-card-top">
+                <div class="am-feature-icon" aria-hidden="true">👤</div>
+                <span class="am-badge-soon">Coming Soon</span>
+              </div>
+              <h3>Profile Management</h3>
+              <p>Keep your farm details and preferences in one simple profile.</p>
+            </article>
+
+            <article class="am-feature-card am-feature-soon">
+              <div class="am-feature-card-top">
+                <div class="am-feature-icon" aria-hidden="true">📱</div>
+                <span class="am-badge-soon">Coming Soon</span>
+              </div>
+              <h3>SMS &amp; WhatsApp Alerts</h3>
+              <p>Get important alerts and reminders directly on your phone.</p>
+            </article>
+
+            <article class="am-feature-card am-feature-soon">
+              <div class="am-feature-card-top">
+                <div class="am-feature-icon" aria-hidden="true">📈</div>
+                <span class="am-badge-soon">Coming Soon</span>
+              </div>
+              <h3>Advanced Analytics Dashboard</h3>
+              <p>Deeper insights into crop health and farm performance.</p>
+            </article>
+
+            <article class="am-feature-card am-feature-soon">
+              <div class="am-feature-card-top">
+                <div class="am-feature-icon" aria-hidden="true">📶</div>
+                <span class="am-badge-soon">Coming Soon</span>
+              </div>
+              <h3>Offline &amp; Low-Bandwidth Mode</h3>
+              <p>Designed to work better even with slow or patchy internet.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS / SOCIAL PROOF -->
+    <section class="am-section am-stats" aria-label="AgriMentor statistics">
+      <div class="am-container am-stats-inner" id="am-stats-section">
+        <div class="am-stat-item">
+          <div class="am-stat-number" data-count="20">0</div>
+          <div class="am-stat-label">Crop Diseases Detected</div>
+        </div>
+        <div class="am-stat-item">
+          <div class="am-stat-number" data-count="5">0</div>
+          <div class="am-stat-label">Soil Types Supported</div>
+        </div>
+        <div class="am-stat-item">
+          <div class="am-stat-number" data-count="100">0<span class="am-stat-suffix">%</span></div>
+          <div class="am-stat-label">Free for Farmers</div>
+        </div>
+        <div class="am-stat-item">
+          <div class="am-stat-number" data-count="1">AI-Powered</div>
+          <div class="am-stat-label">Deep Learning Based</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GOVERNMENT SCHEMES PREVIEW -->
+    <section id="schemes" class="am-section am-schemes">
+      <div class="am-container">
+        <header class="am-section-header">
+          <h2>Latest Government Schemes for Farmers</h2>
+          <p>Stay informed. Access benefits you deserve.</p>
+        </header>
+
+        <div class="am-schemes-grid">
+          {% for scheme in featured_schemes %}
+          <article class="am-scheme-card">
+            <h3>{{ scheme.title }}</h3>
+            <p class="am-scheme-eligibility">{{ scheme.eligibility_summary }}</p>
+            <a href="{{ url_for('scheme_detail', scheme_id=scheme.id) }}" class="am-scheme-link">
+              View Details →
+            </a>
+            <p class="am-scheme-meta">Posted by Admin</p>
+          </article>
+          {% else %}
+          <p class="am-schemes-empty">No schemes posted yet. Check back soon.</p>
+          {% endfor %}
+        </div>
+
+        <div class="am-schemes-cta-wrapper">
+          <a href="{{ url_for('schemes') }}" class="am-btn am-btn-primary">Browse All Schemes →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="am-section am-testimonials">
+      <div class="am-container">
+        <header class="am-section-header">
+          <h2>Built for Real Farmers</h2>
+          <p>Simple tools that fit into everyday farming life.</p>
+        </header>
+
+        <div class="am-testimonial-grid">
+          <figure class="am-testimonial-card">
+            <div class="am-testimonial-quote-mark" aria-hidden="true">“</div>
+            <blockquote>
+              I uploaded a photo of my tomato plant and immediately knew it had blight. The treatment advice saved my crop.
+            </blockquote>
+            <figcaption>Ravi, Maharashtra</figcaption>
+          </figure>
+
+          <figure class="am-testimonial-card">
+            <div class="am-testimonial-quote-mark" aria-hidden="true">“</div>
+            <blockquote>
+              Now I know which crop suits my soil before I even buy seeds. Very helpful and easy to understand.
+            </blockquote>
+            <figcaption>Sunita, Punjab</figcaption>
+          </figure>
+
+          <figure class="am-testimonial-card">
+            <div class="am-testimonial-quote-mark" aria-hidden="true">“</div>
+            <blockquote>
+              Government schemes are confusing. Here I can quickly see which ones fit me and go to the right link.
+            </blockquote>
+            <figcaption>Mahesh, Karnataka</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA PRE-FOOTER -->
+    <section class="am-section am-cta">
+      <div class="am-container am-cta-inner">
+        <h2>Start Protecting Your Crops Today</h2>
+        <p>Join thousands of farmers using AI to make better decisions.</p>
+        <a href="{{ url_for('auth.register_page') }}" class="am-btn am-btn-cta">
+          Get Started — It's Free
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="contact" class="am-footer">
+    <div class="am-container am-footer-main">
+      <div class="am-footer-col">
+        <div class="am-footer-logo">
+          <span class="am-logo-icon" aria-hidden="true">🌱</span>
+          <span class="am-logo-text">AgriMentor</span>
+        </div>
+        <p class="am-footer-text">AgriMentor — AI for every farmer.</p>
+      </div>
+
+      <div class="am-footer-col">
+        <h3 class="am-footer-heading">Quick Links</h3>
+        <ul class="am-footer-list">
+          <li><a href="{{ url_for('index') }}#home">Home</a></li>
+          <li><a href="{{ url_for('index') }}#how-it-works">How It Works</a></li>
+          <li><a href="{{ url_for('index') }}#features">Features</a></li>
+          <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+          <li><a href="{{ url_for('auth.login_page') }}">Login</a></li>
+        </ul>
+      </div>
+
+      <div class="am-footer-col">
+        <h3 class="am-footer-heading">Features</h3>
+        <ul class="am-footer-list">
+          <li><a href="{{ url_for('predict_entry') }}">Disease Detection</a></li>
+          <li><a href="{{ url_for('predict_entry') }}">Crop Recommendation</a></li>
+          <li><a href="{{ url_for('schemes') }}">Government Schemes</a></li>
+          <li><a href="{{ url_for('expert_dashboard') }}">Admin Dashboard</a></li>
+        </ul>
+      </div>
+
+      <div class="am-footer-col">
+        <h3 class="am-footer-heading">Contact</h3>
+        <ul class="am-footer-list">
+          <li><a href="mailto:hello@agrimentor.in">hello@agrimentor.in</a></li>
+          <li><a href="https://github.com/agrimentor" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="am-footer-bottom">
+      <p>© 2025 AgriMentor. Built with ❤️ for Indian Farmers.</p>
+    </div>
+  </footer>
+
+  <!-- Landing Page JS -->
+  <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+</body>
+</html>
+
