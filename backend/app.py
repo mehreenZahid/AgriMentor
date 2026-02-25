@@ -120,7 +120,7 @@ db = mysql.connector.connect(
 cursor = db.cursor(dictionary=True)
 
 # ---------------------------------------------------
-# FARMER DASHBOARD (ML)
+# FARMER DASHBOARD (UPLOAD)
 # ---------------------------------------------------
 
 @app.route("/farmer")
@@ -176,6 +176,7 @@ def upload():
 # ---------------------------------------------------
 
 @app.route("/expert")
+@app.route("/expert_dashboard")
 @login_required
 def expert_dashboard():
 
@@ -239,6 +240,7 @@ def expert_dashboard():
 # USER-FACING DASHBOARD & PAGES (FARMER)
 # ---------------------------------------------------
 
+@app.route("/farmer_dashboard")
 @app.route("/dashboard")
 @login_required
 def dashboard():
@@ -278,6 +280,50 @@ def dashboard():
         recent_predictions=recent_predictions,
         schemes=schemes,
     )
+
+
+# ---------------------------------------------------
+# PUBLIC SCHEMES LISTING
+# ---------------------------------------------------
+
+@app.route("/schemes")
+def schemes():
+    records = []
+    try:
+        cursor.execute(
+            """
+            SELECT id, title, description, eligibility, benefits, deadline, status
+            FROM schemes
+            ORDER BY deadline ASC
+            """
+        )
+        records = cursor.fetchall()
+    except mysql.connector.Error:
+        records = []
+
+    return render_template("schemes.html", schemes=records)
+
+
+@app.route("/schemes/<int:scheme_id>")
+def scheme_detail(scheme_id):
+    scheme = None
+    try:
+        cursor.execute(
+            """
+            SELECT id, title, description, eligibility, benefits, deadline, status
+            FROM schemes
+            WHERE id = %s
+            """,
+            (scheme_id,),
+        )
+        scheme = cursor.fetchone()
+    except mysql.connector.Error:
+        scheme = None
+
+    if not scheme:
+        abort(404)
+
+    return render_template("scheme_detail.html", scheme=scheme)
 
 
 @app.route("/predict")

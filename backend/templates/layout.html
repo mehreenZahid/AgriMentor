@@ -19,27 +19,73 @@
     <nav class="shell-nav-center">
         {% if current_user.is_authenticated %}
             {% if current_user.role == "farmer" %}
-                <a href="{{ url_for('dashboard') }}">Home</a>
-                <a href="{{ url_for('predict_entry') }}">Predict</a>
-                <a href="{{ url_for('history') }}">History</a>
-                <a href="{{ url_for('community') }}">Community</a>
-                <a href="{{ url_for('support') }}">Support</a>
-                <a href="{{ url_for('profile') }}">Profile</a>
+                <a href="{{ url_for('dashboard') }}"
+                   class="shell-nav-link {% if request.endpoint == 'dashboard' %}is-active{% endif %}">
+                    Home
+                </a>
+                <a href="{{ url_for('predict_entry') }}"
+                   class="shell-nav-link {% if request.endpoint == 'predict_entry' %}is-active{% endif %}">
+                    Predict
+                </a>
+                <a href="{{ url_for('history') }}"
+                   class="shell-nav-link {% if request.endpoint == 'history' %}is-active{% endif %}">
+                    History
+                </a>
+                <a href="{{ url_for('community') }}"
+                   class="shell-nav-link {% if request.endpoint == 'community' %}is-active{% endif %}">
+                    Community
+                </a>
+                <a href="{{ url_for('support') }}"
+                   class="shell-nav-link {% if request.endpoint == 'support' %}is-active{% endif %}">
+                    Support
+                </a>
+                <a href="{{ url_for('profile') }}"
+                   class="shell-nav-link {% if request.endpoint == 'profile' %}is-active{% endif %}">
+                    Profile
+                </a>
             {% elif current_user.role == "expert" %}
-                <a href="{{ url_for('expert_dashboard') }}">Home</a>
-                <a href="{{ url_for('expert_dashboard') }}">Analytics</a>
-                <a href="{{ url_for('support') }}">Support</a>
+                <a href="{{ url_for('expert_dashboard') }}"
+                   class="shell-nav-link {% if request.endpoint == 'expert_dashboard' %}is-active{% endif %}">
+                    Home
+                </a>
+                <a href="{{ url_for('expert_dashboard') }}"
+                   class="shell-nav-link {% if request.endpoint == 'expert_dashboard' %}is-active{% endif %}">
+                    Analytics
+                </a>
+                <a href="{{ url_for('support') }}"
+                   class="shell-nav-link {% if request.endpoint == 'support' %}is-active{% endif %}">
+                    Support
+                </a>
             {% endif %}
         {% else %}
-            <a href="{{ url_for('auth.login_page') }}">Home</a>
-            <a href="{{ url_for('auth.login_page') }}">Predict</a>
-            <a href="{{ url_for('auth.login_page') }}">History</a>
-            <a href="{{ url_for('community') }}">Community</a>
-            <a href="{{ url_for('support') }}">Support</a>
+            <a href="{{ url_for('auth.login_page') }}"
+               class="shell-nav-link {% if request.endpoint == 'auth.login_page' %}is-active{% endif %}">
+                Home
+            </a>
+            <a href="{{ url_for('auth.login_page') }}" class="shell-nav-link">
+                Predict
+            </a>
+            <a href="{{ url_for('auth.login_page') }}" class="shell-nav-link">
+                History
+            </a>
+            <a href="{{ url_for('community') }}"
+               class="shell-nav-link {% if request.endpoint == 'community' %}is-active{% endif %}">
+                Community
+            </a>
+            <a href="{{ url_for('support') }}"
+               class="shell-nav-link {% if request.endpoint == 'support' %}is-active{% endif %}">
+                Support
+            </a>
         {% endif %}
     </nav>
 
     <div class="shell-nav-right">
+        <button class="shell-nav-toggle" type="button" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
         {% if current_user.is_authenticated %}
             <span class="shell-user-chip">
                 {{ current_user.name or current_user.email }}
@@ -55,19 +101,43 @@
 <main class="shell-main">
     {% if current_user.is_authenticated %}
         <div class="shell-main-grid">
-            <aside class="shell-sidebar">
+            <aside class="shell-sidebar" id="dashboard-sidebar">
                 {% if current_user.role == "farmer" %}
                     <div class="shell-sidebar-title">Farmer workspace</div>
-                    <a href="{{ url_for('dashboard') }}">Overview</a>
-                    <a href="{{ url_for('predict_entry') }}">Predict</a>
-                    <a href="{{ url_for('history') }}">History</a>
-                    <a href="{{ url_for('community') }}">Community</a>
-                    <a href="{{ url_for('support') }}">Support</a>
-                    <a href="{{ url_for('profile') }}">Profile</a>
+                    <a href="{{ url_for('dashboard') }}"
+                       class="shell-sidebar-link {% if request.endpoint == 'dashboard' %}is-active{% endif %}">
+                        Overview
+                    </a>
+                    <a href="{{ url_for('predict_entry') }}"
+                       class="shell-sidebar-link {% if request.endpoint == 'predict_entry' %}is-active{% endif %}">
+                        Predict
+                    </a>
+                    <a href="{{ url_for('history') }}"
+                       class="shell-sidebar-link {% if request.endpoint == 'history' %}is-active{% endif %}">
+                        History
+                    </a>
+                    <a href="{{ url_for('community') }}"
+                       class="shell-sidebar-link {% if request.endpoint == 'community' %}is-active{% endif %}">
+                        Community
+                    </a>
+                    <a href="{{ url_for('support') }}"
+                       class="shell-sidebar-link {% if request.endpoint == 'support' %}is-active{% endif %}">
+                        Support
+                    </a>
+                    <a href="{{ url_for('profile') }}"
+                       class="shell-sidebar-link {% if request.endpoint == 'profile' %}is-active{% endif %}">
+                        Profile
+                    </a>
                 {% elif current_user.role == "expert" %}
                     <div class="shell-sidebar-title">Expert workspace</div>
-                    <a href="{{ url_for('expert_dashboard') }}">Dashboard</a>
-                    <a href="{{ url_for('support') }}">Support</a>
+                    <a href="{{ url_for('expert_dashboard') }}"
+                       class="shell-sidebar-link {% if request.endpoint == 'expert_dashboard' %}is-active{% endif %}">
+                        Dashboard
+                    </a>
+                    <a href="{{ url_for('support') }}"
+                       class="shell-sidebar-link {% if request.endpoint == 'support' %}is-active{% endif %}">
+                        Support
+                    </a>
                 {% endif %}
             </aside>
 
@@ -107,6 +177,20 @@
         © {{ 2026 }} AgriMentor. All rights reserved.
     </div>
 </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var toggle = document.querySelector('.shell-nav-toggle');
+    var sidebar = document.getElementById('dashboard-sidebar');
+
+    if (!toggle || !sidebar) return;
+
+    toggle.addEventListener('click', function () {
+        sidebar.classList.toggle('is-open');
+        document.body.classList.toggle('shell-sidebar-open');
+    });
+});
+</script>
 
 </body>
 </html>

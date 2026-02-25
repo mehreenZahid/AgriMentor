@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}Scheme Details | AgriMentor{% endblock %}
+
+{% block page_content %}
+<section class="schemes-page">
+    <a href="{{ url_for('schemes') }}">&larr; Back to all schemes</a>
+
+    <article class="scheme-card" style="margin-top: 20px;">
+        <h1>{{ scheme.title }}</h1>
+
+        <div class="scheme-meta">
+            {% if scheme.deadline %}
+                <p><strong>Deadline:</strong> {{ scheme.deadline }}</p>
+            {% endif %}
+            {% if scheme.status %}
+                <p><strong>Status:</strong> {{ scheme.status }}</p>
+            {% endif %}
+        </div>
+
+        {% if scheme.eligibility %}
+            <h2>Eligibility</h2>
+            <p>{{ scheme.eligibility }}</p>
+        {% endif %}
+
+        {% if scheme.benefits %}
+            <h2>Benefits</h2>
+            <p>{{ scheme.benefits }}</p>
+        {% endif %}
+
+        {% if scheme.description %}
+            <h2>Details</h2>
+            <p>{{ scheme.description }}</p>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}
+

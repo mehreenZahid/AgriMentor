@@ -3,10 +3,21 @@
 {% block title %}Dashboard | AgriMentor{% endblock %}
 
 {% block page_content %}
+<div class="shell-page-header">
+    <h1>Dashboard overview</h1>
+    <p>Key actions, latest predictions, and schemes for your farm.</p>
+</div>
+
 <section class="shell-hero">
     <div class="shell-hero-main">
-        <h1>Welcome back, {{ current_user.name or "Farmer" }}.</h1>
-        <p>Track your crop health, review predictions, and discover schemes that support your farm.</p>
+        <p class="shell-hero-kicker">Farmer dashboard</p>
+        <h2>
+            Welcome back,
+            <span class="shell-hero-username">{{ current_user.name or "Farmer" }}</span>.
+        </h2>
+        <p class="shell-hero-subtext">
+            Track crop health, review AI predictions, and discover schemes that support your farm.
+        </p>
         <div class="shell-hero-actions">
             <a href="{{ url_for('predict_entry') }}" class="shell-btn shell-btn-primary">Predict now</a>
             <a href="{{ url_for('history') }}" class="shell-btn shell-btn-ghost">View history</a>
@@ -18,8 +29,20 @@
             {% if recent_predictions %}
                 {% set last = recent_predictions[0] %}
                 <p class="shell-hero-stat-value">{{ last.predicted_class }}</p>
-                <p class="shell-hero-stat-sub">Confidence: {{ last.confidence }}%</p>
-                <p class="shell-hero-stat-sub">On {{ last.upload_time }}</p>
+                {% set conf = last.confidence %}
+                <p class="shell-hero-stat-sub">
+                    Confidence:
+                    <span class="shell-confidence-pill
+                        {% if conf >= 80 %} shell-conf-high
+                        {% elif conf >= 50 %} shell-conf-medium
+                        {% else %} shell-conf-low
+                        {% endif %}">
+                        {{ conf }}%
+                    </span>
+                </p>
+                <p class="shell-hero-timestamp">
+                    Last updated on {{ last.upload_time }}
+                </p>
             {% else %}
                 <p class="shell-hero-empty">No predictions yet. Start by uploading an image.</p>
             {% endif %}
@@ -33,49 +56,75 @@
             <h2>Quick actions</h2>
             <span class="shell-pill">Farmer tools</span>
         </div>
-        <ul class="shell-list">
-            <li><a href="{{ url_for('predict_entry') }}">Upload crop / soil image</a></li>
-            <li><a href="{{ url_for('history') }}">Review recent predictions</a></li>
-            <li><a href="{{ url_for('profile') }}">Update your profile</a></li>
+        <ul class="shell-quick-actions">
+            <li>
+                <a href="{{ url_for('predict_entry') }}" class="shell-quick-action">
+                    <div class="shell-quick-icon">📤</div>
+                    <div class="shell-quick-body">
+                        <div class="shell-quick-title">Upload crop / soil image</div>
+                        <div class="shell-quick-sub">Get an instant health prediction from AgriMentor.</div>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('history') }}" class="shell-quick-action">
+                    <div class="shell-quick-icon">📜</div>
+                    <div class="shell-quick-body">
+                        <div class="shell-quick-title">Review recent predictions</div>
+                        <div class="shell-quick-sub">Compare results over time and spot patterns.</div>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('profile') }}" class="shell-quick-action">
+                    <div class="shell-quick-icon">⚙️</div>
+                    <div class="shell-quick-body">
+                        <div class="shell-quick-title">Update your profile</div>
+                        <div class="shell-quick-sub">Keep farm details current for better insights.</div>
+                    </div>
+                </a>
+            </li>
         </ul>
     </div>
 
-    <div class="shell-card">
+    <div class="shell-card shell-card-history">
         <div class="shell-card-header">
             <h2>Prediction history</h2>
         </div>
         {% if recent_predictions %}
-            <table class="shell-table">
-                <thead>
-                    <tr>
-                        <th>Image</th>
-                        <th>Prediction</th>
-                        <th>Confidence</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in recent_predictions %}
-                    <tr>
-                        <td>{{ row.image_name }}</td>
-                        <td>{{ row.predicted_class }}</td>
-                        <td>{{ row.confidence }}%</td>
-                        <td>{{ row.upload_time }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="shell-table-wrapper">
+                <table class="shell-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Prediction</th>
+                            <th>Confidence</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in recent_predictions %}
+                        <tr>
+                            <td class="shell-col-filename" title="{{ row.image_name }}">{{ row.image_name }}</td>
+                            <td>{{ row.predicted_class }}</td>
+                            <td>{{ row.confidence }}%</td>
+                            <td>{{ row.upload_time }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             <div class="shell-card-footer">
                 <a href="{{ url_for('history') }}">View full history →</a>
             </div>
         {% else %}
-            <p class="shell-empty-state">
-                No predictions to show yet. Try uploading your first image.
-            </p>
+            <div class="shell-empty-state shell-empty-history">
+                <p>No predictions to show yet. Try uploading your first image.</p>
+            </div>
         {% endif %}
     </div>
 
-    <div class="shell-card">
+    <div class="shell-card shell-card-schemes">
         <div class="shell-card-header">
             <h2>Agricultural schemes</h2>
             <span class="shell-pill shell-pill-soft">Govt.</span>
@@ -95,9 +144,14 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="shell-empty-state">
-                Schemes data is not available yet. This section will list relevant government schemes once configured.
-            </p>
+            <div class="shell-empty-state shell-empty-schemes">
+                <div class="shell-empty-illustration">🏛️</div>
+                <div class="shell-empty-title">No schemes connected yet</div>
+                <p class="shell-empty-body">
+                    Relevant government schemes will appear here once your region is configured.
+                    Check back soon or talk to your local advisor.
+                </p>
+            </div>
         {% endif %}
     </div>
 </section>

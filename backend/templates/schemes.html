@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}Government Schemes | AgriMentor{% endblock %}
+
+{% block page_content %}
+<section class="schemes-page">
+    <header class="page-header">
+        <h1>Government Schemes for Farmers</h1>
+        <p>Browse official schemes that can support your farm, income, and resilience.</p>
+    </header>
+
+    <div class="scheme-filter">
+        <input type="text" placeholder="Search by scheme name…" aria-label="Search schemes">
+        <select aria-label="Filter by status">
+            <option value="">All statuses</option>
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+        </select>
+    </div>
+
+    {% if schemes %}
+    <div class="scheme-grid">
+        {% for s in schemes %}
+        <article class="scheme-card">
+            <h3>{{ s.title }}</h3>
+            <div class="scheme-meta">
+                {% if s.deadline %}
+                    <span>Deadline: {{ s.deadline }}</span><br>
+                {% endif %}
+                {% if s.status %}
+                    <span>Status: {{ s.status }}</span>
+                {% endif %}
+            </div>
+            {% if s.eligibility %}
+                <p><strong>Who can apply:</strong> {{ s.eligibility }}</p>
+            {% endif %}
+            {% if s.description %}
+                <p>{{ s.description }}</p>
+            {% endif %}
+            <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}">View details →</a>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No schemes are available yet. Please check back soon.</p>
+    {% endif %}
+</section>
+{% endblock %}
+

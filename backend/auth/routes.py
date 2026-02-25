@@ -87,7 +87,7 @@ def login_page():
 
             login_user(user)
 
-            # ROLE-BASED REDIRECT (same as Google login: app routes at /farmer, /expert)
+            # ROLE-BASED REDIRECT (same as Google login: app routes at /farmer_dashboard, /expert_dashboard)
             if user.role == "farmer":
                 return redirect(url_for("dashboard"))
             elif user.role == "expert":

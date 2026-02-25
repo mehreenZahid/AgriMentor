@@ -1305,3 +1305,602 @@ footer {
     color: #ddd;
     padding: 60px 0;
 }
+
+/* ===========================================
+   Dashboard visual hierarchy & layout refresh
+   (non-breaking overrides for shell classes)
+   =========================================== */
+
+/* Overall dashboard background & main shell spacing */
+body {
+    background-color: #f7f8fa;
+}
+
+.shell-main {
+    max-width: 1120px;
+    margin: 24px auto 56px;
+    padding: 0 16px;
+}
+
+/* Treat main area as a single column; sidebar becomes contextual overlay on mobile only */
+.shell-main-grid {
+    display: block;
+}
+
+/* Page header at top of dashboard */
+.shell-page-header {
+    margin-bottom: 18px;
+}
+
+.shell-page-header h1 {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.shell-page-header p {
+    font-size: 14px;
+    color: #607d8b;
+}
+
+/* Navigation – consistent link + active state */
+.shell-nav-center {
+    display: flex;
+    gap: 18px;
+    font-size: 14px;
+}
+
+.shell-nav-link {
+    font-size: 14px;
+    color: #455a64;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 4px;
+    transition: color 0.2s ease;
+}
+
+.shell-nav-link:hover {
+    color: #1b5e20;
+}
+
+.shell-nav-link.is-active {
+    color: #1b5e20;
+}
+
+.shell-nav-link.is-active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #66bb6a, #1b5e20);
+}
+
+.shell-user-chip {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #e8f5e9;
+    color: #1b5e20;
+    font-size: 13px;
+}
+
+.shell-nav-button {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: #2e7d32;
+    color: #ffffff;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.shell-nav-button:hover {
+    background: #256628;
+    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.35);
+    transform: translateY(-1px);
+}
+
+/* Mobile nav toggle (hamburger) */
+.shell-nav-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+.shell-nav-toggle span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: #455a64;
+    margin: 3px 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Sidebar – elevation + active accent bar */
+.shell-sidebar {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px 16px 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    font-size: 14px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+    display: none; /* hide sidebar by default on desktop to avoid duplicate nav */
+}
+
+.shell-sidebar-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #78909c;
+    margin-bottom: 10px;
+}
+
+.shell-sidebar a {
+    text-decoration: none;
+}
+
+.shell-sidebar-link {
+    display: block;
+    padding: 7px 10px 7px 14px;
+    color: #455a64;
+    border-radius: 10px;
+    position: relative;
+    margin-bottom: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shell-sidebar-link::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 999px;
+    background: transparent;
+    transition: background 0.2s ease;
+}
+
+.shell-sidebar-link:hover {
+    background: #f1f8e9;
+    color: #1b5e20;
+    padding-left: 16px;
+}
+
+.shell-sidebar-link.is-active {
+    background: #e8f5e9;
+    color: #1b5e20;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.shell-sidebar-link.is-active::before {
+    background: linear-gradient(180deg, #81c784, #1b5e20);
+}
+
+/* Hero / welcome hierarchy */
+.shell-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 24px;
+    align-items: stretch;
+    margin-bottom: 32px;
+}
+
+.shell-hero-main h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.shell-hero-username {
+    font-weight: 700;
+    color: #1b5e20;
+}
+
+.shell-hero-kicker {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #90a4ae;
+    margin-bottom: 6px;
+}
+
+.shell-hero-subtext {
+    font-size: 15px;
+    color: #546e7a;
+    margin-bottom: 20px;
+}
+
+.shell-hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.shell-hero-card {
+    background: linear-gradient(135deg, #e8f5e9, #ffffff);
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.shell-hero-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+}
+
+.shell-hero-stat-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #558b2f;
+    margin-bottom: 6px;
+}
+
+.shell-hero-stat-value {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.shell-hero-timestamp {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #78909c;
+}
+
+/* Confidence pill colour-coding */
+.shell-confidence-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.shell-conf-high {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.shell-conf-medium {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.shell-conf-low {
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* Card layout & micro-interactions */
+.shell-section-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr);
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.shell-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.shell-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.shell-card-header h2 {
+    font-size: 18px;
+    margin-bottom: 0;
+    text-align: left;
+}
+
+.shell-card-history {
+    min-height: 260px;
+}
+
+.shell-card-schemes {
+    min-height: 260px;
+    grid-column: 1 / -1; /* full width row for schemes to balance layout */
+}
+
+/* Quick actions – clickable tiles */
+.shell-quick-actions {
+    list-style: none;
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.shell-quick-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #f8faf9;
+    text-decoration: none;
+    color: #263238;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.shell-quick-action:hover {
+    background: #eef6f0;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+.shell-quick-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f5e9;
+    font-size: 18px;
+}
+
+.shell-quick-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.shell-quick-sub {
+    font-size: 12px;
+    color: #78909c;
+}
+
+/* Prediction history table cleanup */
+.shell-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.shell-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 420px;
+}
+
+.shell-table th,
+.shell-table td {
+    padding: 8px 10px;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+}
+
+.shell-table th {
+    background: #f1f8e9;
+    font-weight: 600;
+}
+
+.shell-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.shell-table tbody tr:hover {
+    background: #f0f7f1;
+}
+
+.shell-col-filename {
+    max-width: 210px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Empty states & schemes styling */
+.shell-empty-state {
+    font-size: 14px;
+    color: #607d8b;
+}
+
+.shell-empty-history {
+    padding: 10px 0;
+}
+
+.shell-empty-schemes {
+    padding: 18px 10px 8px;
+    text-align: left;
+}
+
+.shell-empty-illustration {
+    font-size: 26px;
+    margin-bottom: 6px;
+}
+
+.shell-empty-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.shell-empty-body {
+    font-size: 13px;
+    color: #78909c;
+}
+
+/* Shell buttons – consistent micro-interactions */
+.shell-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.shell-btn-primary {
+    background: #2e7d32;
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.35);
+}
+
+.shell-btn-primary:hover {
+    background: #256628;
+    box-shadow: 0 9px 26px rgba(46, 125, 50, 0.45);
+    transform: translateY(-1px);
+}
+
+.shell-btn-ghost {
+    background: #ffffff;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.shell-btn-ghost:hover {
+    background: #f1f8f4;
+}
+
+/* Footer – stronger contrast & structure */
+.shell-footer {
+    border-top: 1px solid #0b2014;
+    margin-top: 40px;
+    padding: 24px 16px 26px;
+    background: #0f2d1d;
+    color: #e0f2f1;
+}
+
+.shell-footer-grid {
+    max-width: 1120px;
+    margin: 0 auto 14px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px;
+    font-size: 13px;
+}
+
+.shell-footer-grid h4 {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.shell-footer-grid p {
+    color: #cfd8dc;
+}
+
+.shell-footer-grid a {
+    color: #a5d6a7;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.shell-footer-grid a:hover {
+    text-decoration: underline;
+    color: #e8f5e9;
+}
+
+.shell-footer-bottom {
+    text-align: center;
+    font-size: 12px;
+    color: #90a4ae;
+}
+
+/* Responsive layout tweaks */
+@media (max-width: 1024px) {
+}
+
+@media (max-width: 800px) {
+    .shell-nav-center {
+        display: none;
+    }
+
+    .shell-nav-toggle {
+        display: inline-block;
+    }
+
+    .shell-sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        bottom: 0;
+        width: 220px;
+        display: block;
+        transform: translateX(-110%);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 30;
+    }
+
+    .shell-sidebar.is-open {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+    }
+
+    body.shell-sidebar-open::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 25;
+    }
+
+    .shell-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .shell-section-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .shell-nav {
+        padding: 10px 16px;
+    }
+
+    .shell-hero-main h2 {
+        font-size: 22px;
+    }
+
+    .shell-hero-subtext {
+        font-size: 14px;
+    }
+
+    .shell-card {
+        padding: 16px 16px;
+    }
+
+    .shell-quick-action {
+        padding: 8px 10px;
+    }
+
+    .shell-table {
+        font-size: 12px;
+    }
+}
