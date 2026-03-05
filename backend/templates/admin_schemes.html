@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+
+{% block title %}Manage Schemes | AgriMentor{% endblock %}
+
+{% block page_content %}
+<div class="admin-container admin-container-schemes">
+    <div class="shell-page-header shell-page-header-schemes">
+        <div>
+            <h1>Manage schemes</h1>
+            <p>Create, review, and archive government-backed schemes visible to farmers.</p>
+        </div>
+        <div class="shell-page-header-actions">
+            <a href="{{ url_for('admin_new_scheme') }}" class="shell-button-primary">
+                + New scheme
+            </a>
+        </div>
+    </div>
+
+    <div class="shell-card shell-card-schemes-list">
+        <div class="shell-card-header">
+            <div>
+                <h2>All schemes</h2>
+                <p class="shell-card-subtitle">
+                    Overview of every scheme currently configured in AgriMentor.
+                </p>
+            </div>
+            <div class="shell-card-meta">
+                <span class="shell-pill-soft">
+                    {% if schemes %}
+                        {{ schemes|length }} total
+                    {% else %}
+                        0 total
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="shell-table-wrapper">
+            <table class="shell-table shell-table-schemes">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Deadline</th>
+                        <th class="shell-col-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if schemes %}
+                        {% for s in schemes %}
+                            <tr>
+                                <td class="shell-col-title">
+                                    <div class="shell-scheme-title">{{ s.title }}</div>
+                                </td>
+                                <td class="shell-col-status">
+                                    {% set status_value = s.status or 'open' %}
+                                    <span class="status-badge status-{{ status_value }}">
+                                        {% if status_value == 'open' %}
+                                            Open
+                                        {% elif status_value == 'closed' %}
+                                            Closed
+                                        {% elif status_value == 'archived' %}
+                                            Archived
+                                        {% else %}
+                                            {{ status_value }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td class="shell-col-deadline">
+                                    {% if s.deadline %}
+                                        {{ s.deadline }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td class="shell-table-actions">
+                                    <a href="{{ url_for('admin_edit_scheme', scheme_id=s.id) }}" class="shell-link-soft">
+                                        Edit
+                                    </a>
+                                    <form action="{{ url_for('admin_archive_scheme', scheme_id=s.id) }}"
+                                          method="POST"
+                                          style="display:inline-block;"
+                                          onsubmit="return confirm('Archive this scheme? It will be hidden from farmers.');">
+                                        <button type="submit" class="shell-link-danger">
+                                            Archive
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">
+                                <div class="shell-empty-state-card">
+                                    <div class="shell-empty-state-icon">📄</div>
+                                    <div class="shell-empty-state-copy">
+                                        <h3>No schemes have been created yet</h3>
+                                        <p>
+                                            Publish your first scheme to make government and institutional support
+                                            easy for farmers to discover inside AgriMentor.
+                                        </p>
+                                    </div>
+                                    <div class="shell-empty-state-actions">
+                                        <a href="{{ url_for('admin_new_scheme') }}" class="shell-button-primary">
+                                            Create scheme
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -48,9 +48,9 @@
                    class="shell-nav-link {% if request.endpoint == 'expert_dashboard' %}is-active{% endif %}">
                     Home
                 </a>
-                <a href="{{ url_for('expert_dashboard') }}"
-                   class="shell-nav-link {% if request.endpoint == 'expert_dashboard' %}is-active{% endif %}">
-                    Analytics
+                <a href="{{ url_for('admin_schemes') }}"
+                   class="shell-nav-link {% if request.endpoint in ['admin_schemes', 'admin_new_scheme', 'admin_edit_scheme'] %}is-active{% endif %}">
+                    Schemes
                 </a>
                 <a href="{{ url_for('support') }}"
                    class="shell-nav-link {% if request.endpoint == 'support' %}is-active{% endif %}">
@@ -133,6 +133,10 @@
                     <a href="{{ url_for('expert_dashboard') }}"
                        class="shell-sidebar-link {% if request.endpoint == 'expert_dashboard' %}is-active{% endif %}">
                         Dashboard
+                    </a>
+                    <a href="{{ url_for('admin_schemes') }}"
+                       class="shell-sidebar-link {% if request.endpoint in ['admin_schemes', 'admin_new_scheme', 'admin_edit_scheme'] %}is-active{% endif %}">
+                        Schemes
                     </a>
                     <a href="{{ url_for('support') }}"
                        class="shell-sidebar-link {% if request.endpoint == 'support' %}is-active{% endif %}">

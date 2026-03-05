@@ -1,0 +1,166 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {% if mode == "edit" %}Edit Scheme | AgriMentor{% else %}New Scheme | AgriMentor{% endif %}
+{% endblock %}
+
+{% block page_content %}
+<div class="admin-container admin-container-scheme-form">
+    <div class="shell-page-header">
+        <div>
+            <h1 class="shell-page-title">
+                {% if mode == "edit" %}
+                    Edit scheme
+                {% else %}
+                    Create new scheme
+                {% endif %}
+            </h1>
+            <p class="shell-page-subtitle">Provide clear details so farmers can quickly understand eligibility and benefits.</p>
+        </div>
+    </div>
+
+    <div class="shell-card shell-card-form">
+        <div class="shell-card-header">
+            <div>
+                <h2>Scheme details</h2>
+                <p class="shell-card-subtitle">Group related information so schemes stay easy to scan and compare.</p>
+            </div>
+        </div>
+
+        {% if error %}
+            <div class="shell-banner-error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" class="shell-form">
+            <!-- Core information -->
+            <section class="shell-form-section">
+                <header class="shell-form-section-header">
+                    <h3>Core information</h3>
+                    <p>Give the scheme a clear, farmer-friendly title and overview.</p>
+                </header>
+
+                <div class="shell-form-grid shell-form-grid-2">
+                    <div class="shell-form-field">
+                        <label class="shell-field-label" for="title">
+                            <span>Title</span>
+                            <span class="shell-required">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            class="shell-input"
+                            required
+                            value="{{ scheme.title or '' }}"
+                            placeholder="e.g. PM-Kisan Income Support"
+                        >
+                        <p class="shell-field-hint">This is what farmers will see first in the schemes list.</p>
+                    </div>
+
+                    <div class="shell-form-field shell-form-field-full">
+                        <label class="shell-field-label" for="description">
+                            <span>Description</span>
+                        </label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            class="shell-textarea"
+                            rows="4"
+                            placeholder="Short overview of what this scheme offers."
+                        >{{ scheme.description or '' }}</textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Eligibility & benefits -->
+            <section class="shell-form-section">
+                <header class="shell-form-section-header">
+                    <h3>Eligibility & benefits</h3>
+                    <p>Clarify who qualifies and what support they receive.</p>
+                </header>
+
+                <div class="shell-form-grid">
+                    <div class="shell-form-field shell-form-field-full">
+                        <label class="shell-field-label" for="eligibility">
+                            <span>Eligibility</span>
+                        </label>
+                        <textarea
+                            id="eligibility"
+                            name="eligibility"
+                            class="shell-textarea"
+                            rows="4"
+                            placeholder="Who can apply? Landholding size, crop types, region, etc."
+                        >{{ scheme.eligibility or '' }}</textarea>
+                    </div>
+
+                    <div class="shell-form-field shell-form-field-full">
+                        <label class="shell-field-label" for="benefits">
+                            <span>Benefits</span>
+                        </label>
+                        <textarea
+                            id="benefits"
+                            name="benefits"
+                            class="shell-textarea"
+                            rows="4"
+                            placeholder="Financial assistance, subsidies, training support, etc."
+                        >{{ scheme.benefits or '' }}</textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Timeline & publishing -->
+            <section class="shell-form-section">
+                <header class="shell-form-section-header">
+                    <h3>Timeline & publishing</h3>
+                    <p>Control when the scheme is visible and open to applications.</p>
+                </header>
+
+                <div class="shell-form-inline">
+                    <div class="shell-form-field">
+                        <label class="shell-field-label" for="deadline">
+                            <span>Deadline</span>
+                        </label>
+                        <input
+                            type="date"
+                            id="deadline"
+                            name="deadline"
+                            class="shell-input"
+                            value="{{ scheme.deadline or '' }}"
+                        >
+                        <p class="shell-field-hint">Leave blank if the scheme has no fixed end date.</p>
+                    </div>
+
+                    <div class="shell-form-field">
+                        <label class="shell-field-label" for="status">
+                            <span>Status</span>
+                        </label>
+                        <select id="status" name="status" class="shell-select">
+                            {% set current_status = scheme.status or 'open' %}
+                            <option value="open" {% if current_status == 'open' %}selected{% endif %}>Open for applications</option>
+                            <option value="closed" {% if current_status == 'closed' %}selected{% endif %}>Closed to new applications</option>
+                            <option value="archived" {% if current_status == 'archived' %}selected{% endif %}>Archived (hidden from farmers)</option>
+                        </select>
+                        <p class="shell-field-hint">Use status to manage whether farmers can see and apply for this scheme.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="shell-form-actions">
+                <a href="{{ url_for('admin_schemes') }}" class="shell-button-secondary">
+                    Cancel
+                </a>
+                <button type="submit" class="shell-button-primary">
+                    {% if mode == "edit" %}
+                        Save changes
+                    {% else %}
+                        Create scheme
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

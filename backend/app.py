@@ -7,6 +7,7 @@ from authlib.integrations.flask_client import OAuth
 from config import Config
 from ml_utils import predict_image
 from auth.routes import auth_bp
+from datetime import datetime
 
 # ---------------------------------------------------
 # APP INITIALIZATION
@@ -267,6 +268,7 @@ def dashboard():
             """
             SELECT title, description, eligibility, benefits, deadline, status
             FROM schemes
+            WHERE status != 'archived'
             ORDER BY deadline ASC
             LIMIT 5
             """
@@ -294,6 +296,7 @@ def schemes():
             """
             SELECT id, title, description, eligibility, benefits, deadline, status
             FROM schemes
+            WHERE status != 'archived'
             ORDER BY deadline ASC
             """
         )
@@ -324,6 +327,181 @@ def scheme_detail(scheme_id):
         abort(404)
 
     return render_template("scheme_detail.html", scheme=scheme)
+
+
+@app.route("/admin/schemes", methods=["GET"])
+@login_required
+def admin_schemes():
+    if current_user.role != "expert":
+        abort(403)
+
+    cursor.execute(
+        """
+        SELECT id, title, status, deadline
+        FROM schemes
+        ORDER BY deadline ASC
+        """
+    )
+    schemes = cursor.fetchall()
+
+    return render_template("admin_schemes.html", schemes=schemes)
+
+
+def _parse_deadline(date_str):
+    date_str = (date_str or "").strip()
+    if not date_str:
+        return None
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+@app.route("/admin/schemes/new", methods=["GET", "POST"])
+@login_required
+def admin_new_scheme():
+    if current_user.role != "expert":
+        abort(403)
+
+    error = None
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        description = request.form.get("description", "").strip()
+        eligibility = request.form.get("eligibility", "").strip()
+        benefits = request.form.get("benefits", "").strip()
+        deadline_input = request.form.get("deadline", "")
+        status = request.form.get("status", "").strip() or "open"
+
+        deadline = _parse_deadline(deadline_input)
+
+        if not title:
+            error = "Title is required."
+        else:
+            cursor.execute(
+                """
+                INSERT INTO schemes (title, description, eligibility, benefits, deadline, status)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (title, description, eligibility, benefits, deadline, status),
+            )
+            db.commit()
+            return redirect(url_for("admin_schemes"))
+
+        scheme = {
+            "title": title,
+            "description": description,
+            "eligibility": eligibility,
+            "benefits": benefits,
+            "deadline": deadline_input,
+            "status": status,
+        }
+    else:
+        scheme = {
+            "title": "",
+            "description": "",
+            "eligibility": "",
+            "benefits": "",
+            "deadline": "",
+            "status": "open",
+        }
+
+    return render_template(
+        "admin_scheme_form.html",
+        mode="create",
+        scheme=scheme,
+        error=error,
+    )
+
+
+@app.route("/admin/schemes/<int:scheme_id>/edit", methods=["GET", "POST"])
+@login_required
+def admin_edit_scheme(scheme_id):
+    if current_user.role != "expert":
+        abort(403)
+
+    error = None
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        description = request.form.get("description", "").strip()
+        eligibility = request.form.get("eligibility", "").strip()
+        benefits = request.form.get("benefits", "").strip()
+        deadline_input = request.form.get("deadline", "")
+        status = request.form.get("status", "").strip() or "open"
+
+        deadline = _parse_deadline(deadline_input)
+
+        if not title:
+            error = "Title is required."
+        else:
+            cursor.execute(
+                """
+                UPDATE schemes
+                SET title=%s,
+                    description=%s,
+                    eligibility=%s,
+                    benefits=%s,
+                    deadline=%s,
+                    status=%s
+                WHERE id=%s
+                """,
+                (title, description, eligibility, benefits, deadline, status, scheme_id),
+            )
+            db.commit()
+            return redirect(url_for("admin_schemes"))
+
+        scheme = {
+            "id": scheme_id,
+            "title": title,
+            "description": description,
+            "eligibility": eligibility,
+            "benefits": benefits,
+            "deadline": deadline_input,
+            "status": status,
+        }
+    else:
+        cursor.execute(
+            """
+            SELECT id, title, description, eligibility, benefits, deadline, status
+            FROM schemes
+            WHERE id = %s
+            """,
+            (scheme_id,),
+        )
+        scheme = cursor.fetchone()
+        if not scheme:
+            abort(404)
+
+        # Normalize deadline for the date input field
+        deadline_value = ""
+        if scheme.get("deadline"):
+            try:
+                deadline_value = scheme["deadline"].strftime("%Y-%m-%d")
+            except AttributeError:
+                # If it's already a string or unexpected type, fall back silently
+                deadline_value = str(scheme["deadline"])
+        scheme["deadline"] = deadline_value
+
+    return render_template(
+        "admin_scheme_form.html",
+        mode="edit",
+        scheme=scheme,
+        error=error,
+    )
+
+
+@app.route("/admin/schemes/<int:scheme_id>/archive", methods=["POST"])
+@login_required
+def admin_archive_scheme(scheme_id):
+    if current_user.role != "expert":
+        abort(403)
+
+    cursor.execute(
+        "UPDATE schemes SET status = 'archived' WHERE id = %s",
+        (scheme_id,),
+    )
+    db.commit()
+    return redirect(url_for("admin_schemes"))
 
 
 @app.route("/predict")

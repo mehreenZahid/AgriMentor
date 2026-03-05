@@ -9,6 +9,24 @@ from models import User
 auth_bp = Blueprint("auth", __name__)
 
 # ---------------------------------------------------
+# REDIRECT AUTHENTICATED USERS AWAY FROM AUTH PAGES
+# ---------------------------------------------------
+
+@auth_bp.before_app_request
+def _redirect_authenticated_from_auth_pages():
+    if not current_user.is_authenticated:
+        return None
+
+    # Protect login and register endpoints for logged-in users
+    if request.endpoint in {"auth.login_page", "auth.register_page"}:
+        if current_user.role == "farmer":
+            return redirect(url_for("dashboard"))
+        else:
+            return redirect(url_for("expert_dashboard"))
+
+    return None
+
+# ---------------------------------------------------
 # BCRYPT INSTANCE
 # ---------------------------------------------------
 
@@ -34,6 +52,11 @@ def root():
 
 @auth_bp.route("/register")
 def register_page():
+    if current_user.is_authenticated:
+        if current_user.role == "farmer":
+            return redirect(url_for("dashboard"))
+        else:
+            return redirect(url_for("expert_dashboard"))
     return render_template("register.html")
 
 
@@ -75,6 +98,12 @@ def register():
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login_page():
+
+    if current_user.is_authenticated:
+        if current_user.role == "farmer":
+            return redirect(url_for("dashboard"))
+        else:
+            return redirect(url_for("expert_dashboard"))
 
     if request.method == "POST":
 

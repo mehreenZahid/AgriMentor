@@ -1,56 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>AgriMentor | Upload Image</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
+{% extends "layout.html" %}
 
-<body class="predict-page">
+{% block title %}Upload Image | AgriMentor{% endblock %}
 
-<div class="navbar">
-    <div class="logo">
-        <img src="{{ url_for('static', filename='images/logo-image.png') }}" height="40">
-    </div>
-
-    <div class="nav-actions">
-        <a href="/logout" class="logout-btn">Logout</a>
-    </div>
-</div>
-
-<div class="predict-shell">
-    <div class="predict-card">
-        <div class="predict-copy">
-            <h2>Upload crop / soil image</h2>
-            <p>
-                Use a clear, well-lit image focusing on the affected area for the most accurate prediction.
-            </p>
-            <ul>
-                <li>Remove strong shadows and glare.</li>
-                <li>Ensure the leaf or soil is in focus.</li>
-                <li>Upload one image at a time.</li>
-            </ul>
-        </div>
-
-        <div class="predict-form">
-            <form action="/upload" method="POST" enctype="multipart/form-data">
-                <input type="file" name="image" id="imageInput" hidden required>
-
-                <label for="imageInput" class="file-label">
-                    Choose image
-                </label>
-
-                <img id="preview" class="preview-img">
-
-                <button type="submit">Run prediction</button>
-            </form>
-
-            {% if prediction %}
-            <div class="result-box">
-                <h3>Prediction result</h3>
-                <p><strong>Disease:</strong> {{ prediction }}</p>
-                <p><strong>Confidence:</strong> {{ confidence }}%</p>
+{% block page_content %}
+<div class="predict-page">
+    <div class="predict-shell">
+        <div class="predict-card">
+            <div class="predict-copy">
+                <h2>Upload crop / soil image</h2>
+                <p>
+                    Use a clear, well-lit image focusing on the affected area for the most accurate prediction.
+                </p>
+                <ul>
+                    <li>Remove strong shadows and glare.</li>
+                    <li>Ensure the leaf or soil is in focus.</li>
+                    <li>Upload one image at a time.</li>
+                </ul>
             </div>
-            {% endif %}
+
+            <div class="predict-form">
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="image" id="imageInput" hidden required>
+
+                    <label for="imageInput" class="file-label">
+                        Choose image
+                    </label>
+
+                    <img id="preview" class="preview-img">
+
+                    <button type="submit">Run prediction</button>
+                </form>
+
+                {% if prediction %}
+                <div class="result-box">
+                    <h3>Prediction result</h3>
+                    <p><strong>Disease:</strong> {{ prediction }}</p>
+                    <p><strong>Confidence:</strong> {{ confidence }}%</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -74,6 +62,4 @@
         }
     });
 </script>
-
-</body>
-</html>
+{% endblock %}

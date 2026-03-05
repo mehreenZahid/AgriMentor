@@ -1,70 +1,19 @@
-<!DOCTYPE html>
-<html>
+{% extends "layout.html" %}
 
-<head>
-    <title>Admin Dashboard | AgriMentor</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .admin-container {
-            padding: 40px;
-        }
+{% block title %}Admin Dashboard | AgriMentor{% endblock %}
 
-        .stats-card {
-            background: #f5f5f5;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        table th,
-        table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-
-        table th {
-            background: #2e7d32;
-            color: white;
-        }
-
-        #predictionChart {
-            max-width: 500px;
-            margin: 40px auto;
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- NAVBAR -->
-    <div class="navbar">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='images/logo-image.png') }}" height="40">
-        </div>
-
-        <div style="color:white; font-weight:bold;">
-            Admin Dashboard
-        </div>
-
-        <div>
-            <a href="{{ url_for('auth.logout') }}">
-                <button class="logout-btn">Logout</button>
-            </a>
-        </div>
+{% block page_content %}
+<div class="admin-container">
+    <div class="shell-page-header">
+        <h1>Expert analytics</h1>
+        <p>Overview of farmer onboarding, total predictions, and disease distribution.</p>
     </div>
 
-    <div class="admin-container">
-
-
-        <!--<h2>Admin Dashboard</h2>-->
-
-        <div class="card">
+    <div class="shell-section-grid">
+        <div class="shell-card">
+            <div class="shell-card-header">
+                <h2>Filter by date</h2>
+            </div>
             <form method="GET" class="filter-form">
                 <div class="filter-group">
                     <div>
@@ -84,70 +33,76 @@
             </form>
         </div>
 
+        <div class="shell-card">
+            <div class="shell-card-header">
+                <h2>Total predictions</h2>
+            </div>
+            <p class="admin-stat-number">{{ prediction_count }}</p>
+        </div>
+    </div>
 
-        <hr>
+    <div class="shell-card" style="margin-top: 20px;">
+        <div class="shell-card-header">
+            <h2>Farmers onboarded</h2>
+        </div>
+        <div class="shell-table-wrapper">
+            <table class="shell-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Joined at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for farmer in farmers %}
+                    <tr>
+                        <td>{{ farmer.name }}</td>
+                        <td>{{ farmer.email }}</td>
+                        <td>{{ farmer.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        <h3>Total Predictions: {{ prediction_count }}</h3>
-
-        <hr>
-
-        <h3>Farmers Onboarded</h3>
-
-        <table border="1" cellpadding="8">
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Joined At</th>
-            </tr>
-
-            {% for farmer in farmers %}
-            <tr>
-                <td>{{ farmer.name }}</td>
-                <td>{{ farmer.email }}</td>
-                <td>{{ farmer.created_at }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-
-        <h3>Prediction Distribution</h3>
-
+    <div class="shell-card" style="margin-top: 20px;">
+        <div class="shell-card-header">
+            <h2>Prediction distribution</h2>
+        </div>
         <canvas id="predictionChart" width="400" height="200"></canvas>
+    </div>
+</div>
 
-        <script id="distribution-data" type="application/json">
+<script id="distribution-data" type="application/json">
     {{ distribution_data | tojson }}
 </script>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const rawData = JSON.parse(
+        document.getElementById('distribution-data').textContent
+    );
 
-        <script>
-            const rawData = JSON.parse(
-                document.getElementById('distribution-data').textContent
-            );
+    const labels = rawData.map(item => item.predicted_class);
+    const counts = rawData.map(item => item.count);
 
-            const labels = rawData.map(item => item.predicted_class);
-            const counts = rawData.map(item => item.count);
+    const data = {
+        labels: labels,
+        datasets: [{
+            data: counts,
+        }]
+    };
 
-            const data = {
-                labels: labels,
-                datasets: [{
-                    data: counts,
-                }]
-            };
+    const config = {
+        type: 'pie',
+        data: data
+    };
 
-            const config = {
-                type: 'pie',
-                data: data
-            };
-
-            new Chart(
-                document.getElementById('predictionChart'),
-                config
-            );
-        </script>
-
-
-
-    </div>
-</body>
-
-</html>
+    new Chart(
+        document.getElementById('predictionChart'),
+        config
+    );
+</script>
+{% endblock %}
