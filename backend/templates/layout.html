@@ -23,6 +23,10 @@
                    class="shell-nav-link {% if request.endpoint == 'dashboard' %}is-active{% endif %}">
                     Home
                 </a>
+                <a href="{{ url_for('schemes') }}"
+                   class="shell-nav-link {% if request.endpoint in ['schemes', 'scheme_detail'] %}is-active{% endif %}">
+                    Schemes
+                </a>
                 <a href="{{ url_for('predict_entry') }}"
                    class="shell-nav-link {% if request.endpoint == 'predict_entry' %}is-active{% endif %}">
                     Predict
@@ -107,6 +111,10 @@
                     <a href="{{ url_for('dashboard') }}"
                        class="shell-sidebar-link {% if request.endpoint == 'dashboard' %}is-active{% endif %}">
                         Overview
+                    </a>
+                    <a href="{{ url_for('schemes') }}"
+                       class="shell-sidebar-link {% if request.endpoint in ['schemes', 'scheme_detail'] %}is-active{% endif %}">
+                        Schemes
                     </a>
                     <a href="{{ url_for('predict_entry') }}"
                        class="shell-sidebar-link {% if request.endpoint == 'predict_entry' %}is-active{% endif %}">

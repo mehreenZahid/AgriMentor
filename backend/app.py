@@ -266,7 +266,7 @@ def dashboard():
     try:
         cursor.execute(
             """
-            SELECT title, description, eligibility, benefits, deadline, status
+            SELECT id, title, description, eligibility, benefits, deadline, status
             FROM schemes
             WHERE status != 'archived'
             ORDER BY deadline ASC

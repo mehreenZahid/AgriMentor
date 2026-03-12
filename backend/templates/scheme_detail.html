@@ -3,36 +3,111 @@
 {% block title %}Scheme Details | AgriMentor{% endblock %}
 
 {% block page_content %}
-<section class="schemes-page">
-    <a href="{{ url_for('schemes') }}">&larr; Back to all schemes</a>
+<section class="schemes-page scheme-detail-page">
+    <a href="{{ url_for('schemes') }}" class="scheme-back-link">← Back to all schemes</a>
 
-    <article class="scheme-card" style="margin-top: 20px;">
-        <h1>{{ scheme.title }}</h1>
+    {% set status_lower = (scheme.status or '')|lower %}
 
-        <div class="scheme-meta">
-            {% if scheme.deadline %}
-                <p><strong>Deadline:</strong> {{ scheme.deadline }}</p>
-            {% endif %}
-            {% if scheme.status %}
-                <p><strong>Status:</strong> {{ scheme.status }}</p>
+    <header class="scheme-detail-header">
+        <div class="scheme-detail-header-main">
+            <p class="scheme-detail-kicker">Government scheme</p>
+            <h1>{{ scheme.title }}</h1>
+            {% if scheme.description %}
+                <p class="scheme-detail-summary">
+                    {{ scheme.description }}
+                </p>
             {% endif %}
         </div>
 
-        {% if scheme.eligibility %}
-            <h2>Eligibility</h2>
-            <p>{{ scheme.eligibility }}</p>
-        {% endif %}
+        <div class="scheme-detail-header-side">
+            {% if scheme.status %}
+                <span class="status-badge status-{{ status_lower }}">
+                    {{ scheme.status|capitalize }}
+                </span>
+            {% endif %}
 
-        {% if scheme.benefits %}
-            <h2>Benefits</h2>
-            <p>{{ scheme.benefits }}</p>
-        {% endif %}
+            <div class="scheme-detail-deadline">
+                {% if scheme.deadline %}
+                    <span class="scheme-deadline-label">⏰ Application deadline</span>
+                    <span class="scheme-deadline-value">{{ scheme.deadline }}</span>
+                {% else %}
+                    <span class="scheme-deadline-label">📅 Ongoing scheme</span>
+                {% endif %}
+            </div>
 
-        {% if scheme.description %}
-            <h2>Details</h2>
-            <p>{{ scheme.description }}</p>
-        {% endif %}
-    </article>
+            <div class="scheme-detail-actions">
+                {% if status_lower == 'open' %}
+                    <a href="#eligibility" class="shell-btn shell-btn-primary scheme-cta">
+                        Apply now
+                    </a>
+                {% elif status_lower == 'closed' %}
+                    <button class="shell-btn shell-btn-ghost scheme-cta scheme-cta-disabled" disabled>
+                        Applications closed
+                    </button>
+                {% elif status_lower == 'upcoming' %}
+                    <button class="shell-btn shell-btn-ghost scheme-cta" disabled>
+                        Opening soon
+                    </button>
+                {% else %}
+                    <a href="#overview" class="shell-btn shell-btn-ghost scheme-cta">
+                        View details
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="scheme-detail-layout">
+        <div class="scheme-detail-main">
+            {% if scheme.description %}
+                <section id="overview" class="scheme-section">
+                    <div class="scheme-section-header">
+                        <span class="scheme-section-icon">📌</span>
+                        <h2>Overview</h2>
+                    </div>
+                    <p>{{ scheme.description }}</p>
+                </section>
+            {% endif %}
+
+            {% if scheme.eligibility %}
+                <section id="eligibility" class="scheme-section">
+                    <div class="scheme-section-header">
+                        <span class="scheme-section-icon">✅</span>
+                        <h2>Eligibility</h2>
+                    </div>
+                    <p>{{ scheme.eligibility }}</p>
+                </section>
+            {% endif %}
+
+            {% if scheme.benefits %}
+                <section id="benefits" class="scheme-section">
+                    <div class="scheme-section-header">
+                        <span class="scheme-section-icon">🎯</span>
+                        <h2>Benefits</h2>
+                    </div>
+                    <p>{{ scheme.benefits }}</p>
+                </section>
+            {% endif %}
+
+            <section id="timeline" class="scheme-section">
+                <div class="scheme-section-header">
+                    <span class="scheme-section-icon">⏱️</span>
+                    <h2>Timeline &amp; deadline</h2>
+                </div>
+                {% if scheme.deadline %}
+                    <p>
+                        Applications are accepted until
+                        <strong>{{ scheme.deadline }}</strong>. Submit your documents before this date.
+                    </p>
+                {% else %}
+                    <p>
+                        This scheme is currently <strong>ongoing</strong>. Check the eligibility and benefits above
+                        before applying through your usual government channel.
+                    </p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
 </section>
 {% endblock %}
 

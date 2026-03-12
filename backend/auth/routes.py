@@ -4,25 +4,54 @@ from flask_bcrypt import Bcrypt
 from models import User
 
 
-
-
 auth_bp = Blueprint("auth", __name__)
 
+
 # ---------------------------------------------------
-# REDIRECT AUTHENTICATED USERS AWAY FROM AUTH PAGES
+# DASHBOARD REDIRECT HELPERS
 # ---------------------------------------------------
 
-@auth_bp.before_app_request
-def _redirect_authenticated_from_auth_pages():
+def _redirect_authenticated_to_dashboard():
+    """
+    Central helper to send an already-authenticated user
+    to the correct dashboard based on their role.
+    Returns a redirect response or None.
+    """
     if not current_user.is_authenticated:
         return None
 
-    # Protect login and register endpoints for logged-in users
-    if request.endpoint in {"auth.login_page", "auth.register_page"}:
-        if current_user.role == "farmer":
-            return redirect(url_for("dashboard"))
-        else:
-            return redirect(url_for("expert_dashboard"))
+    if getattr(current_user, "role", None) == "farmer":
+        return redirect(url_for("dashboard"))
+
+    # Default to expert dashboard for any non-farmer roles
+    return redirect(url_for("expert_dashboard"))
+
+
+AUTH_PAGE_ENDPOINTS = {
+    # Core username/password auth pages
+    "auth.login_page",
+    "auth.register_page",
+    # Add any future auth form endpoints here, e.g. "auth.signup_page"
+}
+
+
+@auth_bp.before_app_request
+def _redirect_authenticated_from_auth_pages():
+    """
+    Global guard: if a logged-in user tries to hit any authentication
+    page (login/register/etc.), immediately send them to their dashboard.
+
+    Works for both direct URL access and internal navigation because it
+    runs before every request in the app.
+    """
+    # Only care about already-authenticated users
+    if not current_user.is_authenticated:
+        return None
+
+    # If the current endpoint is one of our authentication pages,
+    # short-circuit to the appropriate dashboard.
+    if request.endpoint in AUTH_PAGE_ENDPOINTS:
+        return _redirect_authenticated_to_dashboard()
 
     return None
 
@@ -38,11 +67,9 @@ bcrypt = Bcrypt()
 
 @auth_bp.route("/start")
 def root():
-    if current_user.is_authenticated:
-        if current_user.role == "farmer":
-            return redirect(url_for("dashboard"))
-        else:
-            return redirect(url_for("expert_dashboard"))
+    redirect_response = _redirect_authenticated_to_dashboard()
+    if redirect_response:
+        return redirect_response
     return redirect(url_for("auth.login_page"))
 
 
@@ -52,11 +79,9 @@ def root():
 
 @auth_bp.route("/register")
 def register_page():
-    if current_user.is_authenticated:
-        if current_user.role == "farmer":
-            return redirect(url_for("dashboard"))
-        else:
-            return redirect(url_for("expert_dashboard"))
+    redirect_response = _redirect_authenticated_to_dashboard()
+    if redirect_response:
+        return redirect_response
     return render_template("register.html")
 
 
@@ -98,12 +123,9 @@ def register():
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login_page():
-
-    if current_user.is_authenticated:
-        if current_user.role == "farmer":
-            return redirect(url_for("dashboard"))
-        else:
-            return redirect(url_for("expert_dashboard"))
+    redirect_response = _redirect_authenticated_to_dashboard()
+    if redirect_response:
+        return redirect_response
 
     if request.method == "POST":
 

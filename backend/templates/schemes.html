@@ -6,43 +6,100 @@
 <section class="schemes-page">
     <header class="page-header">
         <h1>Government Schemes for Farmers</h1>
-        <p>Browse official schemes that can support your farm, income, and resilience.</p>
+        <p>Browse verified schemes that can support your farm, income, and resilience.</p>
     </header>
 
-    <div class="scheme-filter">
+    <div class="scheme-filter" aria-label="Filter schemes">
         <input type="text" placeholder="Search by scheme name…" aria-label="Search schemes">
         <select aria-label="Filter by status">
             <option value="">All statuses</option>
             <option value="open">Open</option>
             <option value="closed">Closed</option>
+            <option value="upcoming">Upcoming</option>
         </select>
     </div>
 
     {% if schemes %}
     <div class="scheme-grid">
         {% for s in schemes %}
+        {% set status_lower = (s.status or '')|lower %}
         <article class="scheme-card">
-            <h3>{{ s.title }}</h3>
-            <div class="scheme-meta">
-                {% if s.deadline %}
-                    <span>Deadline: {{ s.deadline }}</span><br>
-                {% endif %}
+            <header class="scheme-card-header">
+                <div class="scheme-card-header-text">
+                    <h3>
+                        <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}" class="scheme-title-link">
+                            {{ s.title }}
+                        </a>
+                    </h3>
+                    {% if s.benefits %}
+                        <p class="scheme-benefits-preview">
+                            💡 {{ s.benefits[:140] }}{% if s.benefits|length > 140 %}…{% endif %}
+                        </p>
+                    {% elif s.description %}
+                        <p class="scheme-benefits-preview">
+                            💡 {{ s.description[:140] }}{% if s.description|length > 140 %}…{% endif %}
+                        </p>
+                    {% endif %}
+                </div>
+
                 {% if s.status %}
-                    <span>Status: {{ s.status }}</span>
+                    <span class="status-badge status-{{ status_lower }}">
+                        {{ s.status|capitalize }}
+                    </span>
+                {% endif %}
+            </header>
+
+            <div class="scheme-card-body">
+                {% if s.eligibility %}
+                    <p class="scheme-eligibility-preview">
+                        <span class="scheme-icon">✅</span>
+                        <span>{{ s.eligibility }}</span>
+                    </p>
                 {% endif %}
             </div>
-            {% if s.eligibility %}
-                <p><strong>Who can apply:</strong> {{ s.eligibility }}</p>
-            {% endif %}
-            {% if s.description %}
-                <p>{{ s.description }}</p>
-            {% endif %}
-            <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}">View details →</a>
+
+            <footer class="scheme-card-footer">
+                <div class="scheme-deadline">
+                    {% if s.deadline %}
+                        <span class="scheme-deadline-label">⏰ Deadline</span>
+                        <span class="scheme-deadline-value">{{ s.deadline }}</span>
+                    {% else %}
+                        <span class="scheme-deadline-label">📅 Ongoing scheme</span>
+                    {% endif %}
+                </div>
+
+                <div class="scheme-card-actions">
+                    {% if status_lower == 'open' %}
+                        <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}"
+                           class="shell-btn shell-btn-primary scheme-cta">
+                            Apply now
+                        </a>
+                    {% elif status_lower == 'closed' %}
+                        <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}"
+                           class="shell-btn shell-btn-ghost scheme-cta scheme-cta-disabled"
+                           aria-disabled="true">
+                            Applications closed
+                        </a>
+                    {% elif status_lower == 'upcoming' %}
+                        <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}"
+                           class="shell-btn shell-btn-ghost scheme-cta">
+                            View details
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}"
+                           class="shell-btn shell-btn-ghost scheme-cta">
+                            View details
+                        </a>
+                    {% endif %}
+                </div>
+            </footer>
         </article>
         {% endfor %}
     </div>
     {% else %}
-    <p>No schemes are available yet. Please check back soon.</p>
+    <p class="schemes-empty-message">
+        No schemes are available yet. Please check back soon or contact your local agriculture office for updates.
+    </p>
     {% endif %}
 </section>
 {% endblock %}

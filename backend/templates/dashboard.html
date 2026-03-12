@@ -126,23 +126,36 @@
 
     <div class="shell-card shell-card-schemes">
         <div class="shell-card-header">
-            <h2>Agricultural schemes</h2>
-            <span class="shell-pill shell-pill-soft">Govt.</span>
+            <h2>Government schemes</h2>
+            <span class="shell-pill shell-pill-soft">Support</span>
         </div>
         {% if schemes %}
             <ul class="shell-list">
                 {% for s in schemes %}
                 <li>
-                    <div class="shell-scheme-title">{{ s.title }}</div>
+                    <div class="shell-scheme-title">
+                        <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}">{{ s.title }}</a>
+                    </div>
                     <div class="shell-scheme-meta">
                         <span>Status: {{ s.status }}</span>
                         {% if s.deadline %}
                             <span>Deadline: {{ s.deadline }}</span>
                         {% endif %}
                     </div>
+                    <div class="shell-card-footer">
+                        <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}"
+                           class="shell-btn shell-btn-ghost scheme-cta">
+                            View details
+                        </a>
+                    </div>
                 </li>
                 {% endfor %}
             </ul>
+            <div class="shell-card-footer">
+                <a href="{{ url_for('schemes') }}" class="shell-btn shell-btn-primary">
+                    Browse all schemes
+                </a>
+            </div>
         {% else %}
             <div class="shell-empty-state shell-empty-schemes">
                 <div class="shell-empty-illustration">🏛️</div>
