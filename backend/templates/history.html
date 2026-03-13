@@ -24,7 +24,13 @@
             <tbody>
                 {% for row in predictions %}
                 <tr>
-                    <td>{{ row.image_name }}</td>
+                    <td>
+                        <img
+                            src="{{ url_for('uploaded_file', filename=row.image_name) }}"
+                            alt="{{ row.image_name }}"
+                            class="shell-thumb-img"
+                        >
+                    </td>
                     <td>{{ row.predicted_class }}</td>
                     <td>{{ row.confidence }}%</td>
                     <td>{{ row.upload_time }}</td>

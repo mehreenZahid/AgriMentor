@@ -7,37 +7,111 @@
     <div class="predict-shell">
         <div class="predict-card">
             <div class="predict-copy">
-                <h2>Upload crop / soil image</h2>
-                <p>
-                    Use a clear, well-lit image focusing on the affected area for the most accurate prediction.
+                <h2>Upload a crop image to detect disease</h2>
+                <p class="predict-intro">
+                    Get an AI-assisted health check for your crops. Use a clear, well‑lit photo of the affected area for the most accurate prediction.
                 </p>
-                <ul>
-                    <li>Remove strong shadows and glare.</li>
-                    <li>Ensure the leaf or soil is in focus.</li>
-                    <li>Upload one image at a time.</li>
-                </ul>
+
+                <div class="predict-guidance">
+                    <div class="predict-guidance-column">
+                        <h3>Best results tips</h3>
+                        <ul>
+                            <li>Capture a single leaf or small affected area, filling most of the frame.</li>
+                            <li>Avoid strong shadows, glare, or blurred images.</li>
+                            <li>Use natural daylight where possible (no harsh flash).</li>
+                            <li>Keep the background simple so the leaf stands out.</li>
+                        </ul>
+                    </div>
+                    <div class="predict-guidance-column">
+                        <h3>Upload guidelines</h3>
+                        <ul>
+                            <li>Upload one image at a time.</li>
+                            <li>Supported formats: <strong>JPG, JPEG, PNG</strong>.</li>
+                            <li>Preferred orientation: leaf or plant centred in the image.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="predict-illustration">
+                    <div class="predict-illustration-badge">AI crop health</div>
+                    <div class="predict-illustration-plant">🌿</div>
+                    <p>Securely analyse your field photos and build a history of crop health over time.</p>
+                </div>
             </div>
 
             <div class="predict-form">
-                <form action="/upload" method="POST" enctype="multipart/form-data">
+                <form action="/upload" method="POST" enctype="multipart/form-data" class="predict-form-inner">
                     <input type="file" name="image" id="imageInput" hidden required>
 
-                    <label for="imageInput" class="file-label">
-                        Choose image
-                    </label>
+                    <div id="uploadDropzone" class="predict-dropzone" aria-label="Upload crop image">
+                        <div class="predict-dropzone-icon">📷</div>
+                        <div class="predict-dropzone-text">
+                            <h3>Drag &amp; drop a crop image</h3>
+                            <p>or <span class="predict-dropzone-browse">click to browse from your device</span></p>
+                            <p class="predict-dropzone-meta">
+                                Supported: JPG, JPEG, PNG &nbsp;·&nbsp; For leaves, fruits, stems, or soil close‑ups.
+                            </p>
+                        </div>
+                        <label for="imageInput" class="predict-dropzone-overlay"></label>
+                    </div>
 
-                    <img id="preview" class="preview-img">
+                    <p class="file-hint">
+                        Upload a clear, well‑framed photo of the affected part of the plant. Avoid blurry or very dark images.
+                    </p>
 
-                    <button type="submit">Run prediction</button>
+                    <div class="predict-preview-shell" id="previewShell" hidden>
+                        <div class="predict-preview-header">
+                            <span class="predict-preview-label">Selected image</span>
+                            <span class="predict-preview-filename" id="previewFilename"></span>
+                        </div>
+                        <div class="predict-preview-frame">
+                            <img id="preview" class="preview-img" alt="Preview of uploaded crop image">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="shell-btn shell-btn-primary predict-submit-btn">
+                        Run prediction
+                    </button>
                 </form>
 
-                {% if prediction %}
                 <div class="result-box">
-                    <h3>Prediction result</h3>
-                    <p><strong>Disease:</strong> {{ prediction }}</p>
-                    <p><strong>Confidence:</strong> {{ confidence }}%</p>
+                    {% if prediction %}
+                    <div class="predict-result-card">
+                        <div class="predict-result-header">
+                            <div>
+                                <div class="predict-result-kicker">Latest prediction</div>
+                                <h3>Crop health analysis</h3>
+                            </div>
+                            <div class="predict-result-pill">
+                                AI insight
+                            </div>
+                        </div>
+                        <div class="predict-result-body">
+                            <p class="predict-result-row">
+                                <span class="predict-result-label">Detected disease</span>
+                                <span class="predict-result-value">{{ prediction }}</span>
+                            </p>
+                            <p class="predict-result-row">
+                                <span class="predict-result-label">Model confidence</span>
+                                <span class="predict-result-value">
+                                    {{ confidence }}%
+                                </span>
+                            </p>
+                        </div>
+                        <p class="predict-result-footnote">
+                            This prediction is an AI‑generated suggestion and should be combined with field observations or agronomist advice before taking critical decisions.
+                        </p>
+                    </div>
+                    {% else %}
+                    <div class="predict-result-placeholder">
+                        <div class="predict-result-placeholder-icon">🌱</div>
+                        <div>
+                            <h3>No prediction yet</h3>
+                            <p>Upload a crop image on the left to see disease detection results here.</p>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -46,20 +120,56 @@
 <script>
     const imageInput = document.getElementById('imageInput');
     const preview = document.getElementById('preview');
+    const previewShell = document.getElementById('previewShell');
+    const previewFilename = document.getElementById('previewFilename');
+    const dropzone = document.getElementById('uploadDropzone');
+
+    function updatePreview(file) {
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.addEventListener('load', function() {
+            preview.src = this.result;
+            previewShell.hidden = false;
+        });
+
+        previewFilename.textContent = file.name;
+        reader.readAsDataURL(file);
+    }
 
     imageInput.addEventListener('change', function() {
         const file = this.files[0];
-
         if (file) {
-            const reader = new FileReader();
-
-            reader.addEventListener('load', function() {
-                preview.src = this.result;
-                preview.style.display = "block";
-            });
-
-            reader.readAsDataURL(file);
+            updatePreview(file);
         }
     });
+
+    if (dropzone) {
+        ['dragenter', 'dragover'].forEach(evtName => {
+            dropzone.addEventListener(evtName, (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                dropzone.classList.add('is-dragover');
+            });
+        });
+
+        ['dragleave', 'dragend', 'drop'].forEach(evtName => {
+            dropzone.addEventListener(evtName, (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                dropzone.classList.remove('is-dragover');
+            });
+        });
+
+        dropzone.addEventListener('drop', (event) => {
+            const dt = event.dataTransfer;
+            if (!dt || !dt.files || !dt.files.length) return;
+            const file = dt.files[0];
+
+            imageInput.files = dt.files;
+            updatePreview(file);
+        });
+    }
 </script>
 {% endblock %}

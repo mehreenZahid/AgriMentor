@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, abort
+from flask import Flask, render_template, request, redirect, url_for, abort, send_from_directory
 import os
 import mysql.connector
 from flask_login import LoginManager, login_required, current_user
@@ -105,6 +105,20 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+
+# ---------------------------------------------------
+# UPLOADED IMAGE SERVING
+# ---------------------------------------------------
+
+
+@app.route("/uploads/<path:filename>")
+@login_required
+def uploaded_file(filename):
+    if current_user.role not in ("farmer", "expert"):
+        abort(403)
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
 
 # ---------------------------------------------------
 # DATABASE CONNECTION (ML SAFE - NOT REMOVED)
@@ -327,6 +341,16 @@ def scheme_detail(scheme_id):
         abort(404)
 
     return render_template("scheme_detail.html", scheme=scheme)
+
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
 
 
 @app.route("/admin/schemes", methods=["GET"])
