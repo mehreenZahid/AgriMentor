@@ -204,14 +204,15 @@ def upload():
         predicted_class, confidence = predict_image(image_path)
 
         query = """
-        INSERT INTO uploads (image_name, upload_time, predicted_class, confidence, status)
-        VALUES (%s, NOW(), %s, %s, %s)
+        INSERT INTO uploads (image_name, upload_time, predicted_class, confidence, status, farmer_id)
+        VALUES (%s, NOW(), %s, %s, %s, %s)
         """
         cursor.execute(query, (
             filename,
             predicted_class,
             float(confidence),
-            "completed"
+            "completed",
+            current_user.id
         ))
         db.commit()
 
@@ -316,9 +317,10 @@ def dashboard():
         """
         SELECT image_name, upload_time, predicted_class, confidence
         FROM uploads
+        WHERE farmer_id = %s
         ORDER BY upload_time DESC
         LIMIT 5
-        """
+        """, (current_user.id,)
     )
     recent_predictions = cursor.fetchall()
 
@@ -617,9 +619,10 @@ def history():
         """
         SELECT image_name, upload_time, predicted_class, confidence
         FROM uploads
+        WHERE farmer_id = %s
         ORDER BY upload_time DESC
         LIMIT 50
-        """
+        """, (current_user.id,)
     )
     predictions = cursor.fetchall()
 

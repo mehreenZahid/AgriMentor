@@ -4,16 +4,18 @@
 
 {% block page_content %}
 <div class="dashboard-overview">
+{% if not recent_predictions %}
 <div class="shell-page-header">
     <h1>Dashboard Overview</h1>
     <p>Key actions, latest predictions, and schemes for your farm.</p>
 </div>
+{% endif %}
 
 <section class="shell-hero">
     <div class="shell-hero-main">
         <p class="shell-hero-kicker">Farmer dashboard</p>
         <h2>
-            Welcome back,
+            {% if recent_predictions %}Welcome back,{% else %}Welcome,{% endif %}
             <span class="shell-hero-username">{{ current_user.name or "Farmer" }}</span>.
         </h2>
         <p class="shell-hero-subtext">
@@ -127,6 +129,9 @@
         {% else %}
             <div class="shell-empty-state shell-empty-history">
                 <p>No predictions to show yet. Try uploading your first image.</p>
+                <div style="margin-top: 1rem;">
+                    <a href="{{ url_for('predict_entry') }}" class="shell-btn shell-btn-primary">Start your first prediction</a>
+                </div>
             </div>
         {% endif %}
     </div>

@@ -1,0 +1,1 @@
+[["id", "int(11)", "NO", "PRI", null, "auto_increment"], ["image_name", "varchar(255)", "YES", "", null, ""], ["upload_time", "timestamp", "NO", "", "current_timestamp()", ""], ["status", "varchar(50)", "YES", "", null, ""], ["predicted_class", "varchar(100)", "YES", "", null, ""], ["confidence", "float", "YES", "", null, ""], ["farmer_id", "int(11)", "YES", "MUL", null, ""]]
