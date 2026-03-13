@@ -71,6 +71,7 @@ img {
 .am-navbar {
   position: sticky;
   top: 0;
+  z-index: 1000;
   backdrop-filter: blur(12px);
   background: rgba(248, 250, 249, 0.9);
   border-bottom: 1px solid rgba(229, 231, 235, 0.8);
@@ -190,6 +191,7 @@ img {
 .am-mobile-menu {
   position: fixed;
   inset: 0;
+  z-index: 2000;
   background: rgba(0, 0, 0, 0.6);
   display: none;
   align-items: flex-start;
@@ -742,17 +744,22 @@ img {
   position: absolute;
   top: 12px;
   left: 16px;
+  z-index: 0;
   font-size: 2.4rem;
   color: var(--color-accent);
   opacity: 0.2;
 }
 
 .am-testimonial-card blockquote {
+  position: relative;
+  z-index: 1;
   margin: 18px 0 10px;
   font-size: 0.95rem;
 }
 
 .am-testimonial-card figcaption {
+  position: relative;
+  z-index: 1;
   font-size: 0.85rem;
   color: var(--color-muted);
 }
