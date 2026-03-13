@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, abort, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, abort, send_from_directory, flash
 import os
+import logging
 import mysql.connector
+from werkzeug.utils import secure_filename
 from flask_login import LoginManager, login_required, current_user
 from flask_bcrypt import Bcrypt
 from authlib.integrations.flask_client import OAuth
@@ -100,11 +102,29 @@ def index():
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = app.config["UPLOAD_FOLDER"]
+ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
+MAX_CONTENT_LENGTH_MB = 10
+MAX_CONTENT_LENGTH = MAX_CONTENT_LENGTH_MB * 1024 * 1024
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+
+# ---------------------------------------------------
+# LOGGING
+# ---------------------------------------------------
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+def _allowed_file(filename):
+    if not filename or "." not in filename:
+        return False
+    ext = filename.rsplit(".", 1)[1].lower()
+    return ext in ALLOWED_EXTENSIONS
 
 
 # ---------------------------------------------------
@@ -154,37 +174,56 @@ def upload():
         abort(403)
 
     if "image" not in request.files:
-        return "No file part"
+        flash("No file was uploaded. Please select an image.", "danger")
+        return redirect(url_for("farmer_dashboard"))
 
     image = request.files["image"]
 
-    if image.filename == "":
-        return "No file selected"
+    if not image or not image.filename or image.filename.strip() == "":
+        flash("Please select an image to upload.", "danger")
+        return redirect(url_for("farmer_dashboard"))
 
-    image_path = os.path.join(app.config["UPLOAD_FOLDER"], image.filename)
-    image.save(image_path)
+    if not _allowed_file(image.filename):
+        flash("Please upload a valid image file (JPG or PNG only).", "danger")
+        return redirect(url_for("farmer_dashboard"))
 
-    predicted_class, confidence = predict_image(image_path)
+    image.seek(0, 2)
+    size = image.tell()
+    image.seek(0)
+    if size > MAX_CONTENT_LENGTH:
+        flash(f"File size must be less than {MAX_CONTENT_LENGTH_MB} MB.", "danger")
+        return redirect(url_for("farmer_dashboard"))
 
-    query = """
-    INSERT INTO uploads (image_name, upload_time, predicted_class, confidence, status)
-    VALUES (%s, NOW(), %s, %s, %s)
-    """
+    try:
+        filename = secure_filename(image.filename)
+        if not filename:
+            filename = "upload_" + str(int(datetime.now().timestamp())) + ".jpg"
+        image_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        image.save(image_path)
 
-    cursor.execute(query, (
-        image.filename,
-        predicted_class,
-        float(confidence),
-        "completed"
-    ))
+        predicted_class, confidence = predict_image(image_path)
 
-    db.commit()
+        query = """
+        INSERT INTO uploads (image_name, upload_time, predicted_class, confidence, status)
+        VALUES (%s, NOW(), %s, %s, %s)
+        """
+        cursor.execute(query, (
+            filename,
+            predicted_class,
+            float(confidence),
+            "completed"
+        ))
+        db.commit()
 
-    return render_template(
-        "upload.html",
-        prediction=predicted_class,
-        confidence=confidence
-    )
+        return render_template(
+            "upload.html",
+            prediction=predicted_class,
+            confidence=confidence
+        )
+    except Exception as ex:
+        logger.exception("Upload or prediction failed")
+        flash("Something went wrong while processing your image. Please try again.", "danger")
+        return redirect(url_for("farmer_dashboard"))
 
 # ---------------------------------------------------
 # EXPERT DASHBOARD
@@ -230,6 +269,13 @@ def expert_dashboard():
     prediction_count = cursor.fetchone()["total"]
 
     # ------------------------
+    # TOTAL FARMERS COUNT
+    # ------------------------
+
+    cursor.execute("SELECT COUNT(*) as total FROM users WHERE role='farmer'")
+    total_farmers_count = cursor.fetchone()["total"]
+
+    # ------------------------
     # PREDICTION DISTRIBUTION
     # ------------------------
 
@@ -247,6 +293,7 @@ def expert_dashboard():
     "admin_dashboard.html",
     farmers=farmers,
     prediction_count=prediction_count,
+    total_farmers_count=total_farmers_count,
     distribution_data=distribution_data
 )
 
@@ -377,8 +424,12 @@ def _parse_deadline(date_str):
         return None
     try:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
+    except (ValueError, TypeError):
         return None
+
+
+def _valid_status(s):
+    return s in ("open", "closed", "archived")
 
 
 @app.route("/admin/schemes/new", methods=["GET", "POST"])
@@ -389,27 +440,35 @@ def admin_new_scheme():
 
     error = None
     if request.method == "POST":
-        title = request.form.get("title", "").strip()
-        description = request.form.get("description", "").strip()
-        eligibility = request.form.get("eligibility", "").strip()
-        benefits = request.form.get("benefits", "").strip()
-        deadline_input = request.form.get("deadline", "")
-        status = request.form.get("status", "").strip() or "open"
+        title = (request.form.get("title") or "").strip()
+        description = (request.form.get("description") or "").strip()
+        eligibility = (request.form.get("eligibility") or "").strip()
+        benefits = (request.form.get("benefits") or "").strip()
+        deadline_input = (request.form.get("deadline") or "").strip()
+        status = (request.form.get("status") or "").strip() or "open"
 
         deadline = _parse_deadline(deadline_input)
 
         if not title:
             error = "Title is required."
+        elif deadline_input and deadline is None:
+            error = "Please enter a valid deadline date (YYYY-MM-DD)."
+        elif not _valid_status(status):
+            error = "Status must be one of: Open, Closed, or Archived."
         else:
-            cursor.execute(
-                """
-                INSERT INTO schemes (title, description, eligibility, benefits, deadline, status)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                """,
-                (title, description, eligibility, benefits, deadline, status),
-            )
-            db.commit()
-            return redirect(url_for("admin_schemes"))
+            try:
+                cursor.execute(
+                    """
+                    INSERT INTO schemes (title, description, eligibility, benefits, deadline, status)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """,
+                    (title, description, eligibility, benefits, deadline, status),
+                )
+                db.commit()
+                return redirect(url_for("admin_schemes"))
+            except Exception as ex:
+                logger.exception("Admin scheme creation failed")
+                error = "Something went wrong. Please try again."
 
         scheme = {
             "title": title,
@@ -446,33 +505,41 @@ def admin_edit_scheme(scheme_id):
     error = None
 
     if request.method == "POST":
-        title = request.form.get("title", "").strip()
-        description = request.form.get("description", "").strip()
-        eligibility = request.form.get("eligibility", "").strip()
-        benefits = request.form.get("benefits", "").strip()
-        deadline_input = request.form.get("deadline", "")
-        status = request.form.get("status", "").strip() or "open"
+        title = (request.form.get("title") or "").strip()
+        description = (request.form.get("description") or "").strip()
+        eligibility = (request.form.get("eligibility") or "").strip()
+        benefits = (request.form.get("benefits") or "").strip()
+        deadline_input = (request.form.get("deadline") or "").strip()
+        status = (request.form.get("status") or "").strip() or "open"
 
         deadline = _parse_deadline(deadline_input)
 
         if not title:
             error = "Title is required."
+        elif deadline_input and deadline is None:
+            error = "Please enter a valid deadline date (YYYY-MM-DD)."
+        elif not _valid_status(status):
+            error = "Status must be one of: Open, Closed, or Archived."
         else:
-            cursor.execute(
-                """
-                UPDATE schemes
-                SET title=%s,
-                    description=%s,
-                    eligibility=%s,
-                    benefits=%s,
-                    deadline=%s,
-                    status=%s
-                WHERE id=%s
-                """,
-                (title, description, eligibility, benefits, deadline, status, scheme_id),
-            )
-            db.commit()
-            return redirect(url_for("admin_schemes"))
+            try:
+                cursor.execute(
+                    """
+                    UPDATE schemes
+                    SET title=%s,
+                        description=%s,
+                        eligibility=%s,
+                        benefits=%s,
+                        deadline=%s,
+                        status=%s
+                    WHERE id=%s
+                    """,
+                    (title, description, eligibility, benefits, deadline, status, scheme_id),
+                )
+                db.commit()
+                return redirect(url_for("admin_schemes"))
+            except Exception as ex:
+                logger.exception("Admin scheme update failed")
+                error = "Something went wrong. Please try again."
 
         scheme = {
             "id": scheme_id,
@@ -567,14 +634,23 @@ def profile():
         abort(403)
 
     if request.method == "POST":
-        name = request.form.get("name", "").strip()
-        if name:
-            cursor.execute(
-                "UPDATE users SET name = %s WHERE id = %s",
-                (name, current_user.id),
-            )
-            db.commit()
-            current_user.name = name
+        name = (request.form.get("name") or "").strip()
+        if not name:
+            flash("Please enter your name.", "danger")
+        elif len(name) < 2:
+            flash("Name must be at least 2 characters.", "danger")
+        else:
+            try:
+                cursor.execute(
+                    "UPDATE users SET name = %s WHERE id = %s",
+                    (name, current_user.id),
+                )
+                db.commit()
+                current_user.name = name
+                flash("Profile updated successfully.", "success")
+            except Exception as ex:
+                logger.exception("Profile update failed")
+                flash("Something went wrong. Please try again.", "danger")
 
     return render_template("profile.html", user=current_user)
 

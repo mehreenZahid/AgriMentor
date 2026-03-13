@@ -158,6 +158,16 @@
             <div class="shell-main-content">
     {% endif %}
 
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                    <div class="flash-message flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
                 {% block page_content %}{% endblock %}
 
             </div>

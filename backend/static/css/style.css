@@ -74,15 +74,83 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 24px 16px;
+    padding: 32px 16px;
+}
+
+/* Two-column auth layout */
+.auth-layout {
+    width: 100%;
+    max-width: 980px;
+    min-height: 520px;
+    display: flex;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 26px 60px rgba(0, 0, 0, 0.16);
+}
+
+.auth-illustration {
+    flex: 1.1;
+    position: relative;
+    background-image:
+        linear-gradient(135deg, rgba(21, 101, 52, 0.12), rgba(27, 94, 32, 0.42)),
+        url("/static/images/farm-hero.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.auth-illustration-overlay {
+    position: absolute;
+    inset: 0;
+    padding: 28px 28px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: #e8f5e9;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.45)
+    );
+}
+
+.auth-illustration-copy h1 {
+    font-size: 26px;
+    line-height: 1.2;
+    margin: 12px 0 8px;
+}
+
+.auth-illustration-copy p {
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 360px;
+    color: #e0f2f1;
+}
+
+.auth-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(224, 242, 241, 0.18);
+    border: 1px solid rgba(200, 230, 201, 0.6);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+}
+
+.auth-form-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 32px 36px;
 }
 
 .auth-card {
-    background: #ffffff;
-    padding: 32px 32px 28px;
-    width: 380px;
-    border-radius: 14px;
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 380px;
 }
 
 .auth-card h2 {
@@ -100,14 +168,24 @@ button:hover {
 .auth-card input[type="password"],
 .auth-card input[type="text"] {
     width: 100%;
-    padding: 10px 12px;
+    padding: 11px 13px;
     margin-bottom: 12px;
-    border-radius: 8px;
+    border-radius: 9px;
     border: 1px solid #cfd8dc;
+    font-size: 14px;
+}
+
+.auth-card input[type="email"]:focus,
+.auth-card input[type="password"]:focus,
+.auth-card input[type="text"]:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 1px rgba(46, 125, 50, 0.16);
+    background-color: #fbfffc;
 }
 
 .auth-card button {
-    margin-top: 4px;
+    margin-top: 6px;
 }
 
 .auth-secondary-action {
@@ -136,6 +214,40 @@ button:hover {
     margin-top: 16px;
     font-size: 13px;
     color: #607d8b;
+}
+
+/* Responsive behaviour for auth split layout */
+@media (max-width: 900px) {
+    .auth-layout {
+        flex-direction: column;
+        max-width: 520px;
+        min-height: auto;
+    }
+
+    .auth-illustration {
+        flex: none;
+        height: 220px;
+    }
+
+    .auth-form-panel {
+        padding: 24px 20px 28px;
+    }
+}
+
+@media (max-width: 640px) {
+    .auth-layout {
+        max-width: 100%;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Optionally hide illustration on very small screens for focus */
+    .auth-illustration {
+        display: none;
+    }
+
+    .auth-form-panel {
+        padding: 28px 18px 28px;
+    }
 }
 
 /* Table styling */
@@ -324,6 +436,35 @@ body {
 .admin-container h3,
 .admin-container h2 {
     margin-bottom: 15px;
+}
+
+/* Admin analytics two-column layout: filter left, stat cards right */
+.admin-analytics-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.5fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.admin-analytics-filter {
+    min-height: 1px;
+}
+
+.admin-analytics-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.admin-analytics-stats .shell-card {
+    width: 100%;
+}
+
+.admin-stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1b5e20;
+    margin: 0;
 }
 
 /* Improve table look (without removing existing table styling) */
@@ -1960,6 +2101,203 @@ body {
     background: linear-gradient(180deg, #81c784, #1b5e20);
 }
 
+/* ===================================================== */
+/* Farmer Dashboard Overview – layout and hierarchy      */
+/* ===================================================== */
+
+.dashboard-overview {
+    width: 100%;
+    max-width: 100%;
+    text-align: left;
+}
+
+.dashboard-overview .shell-hero {
+    text-align: left;
+}
+
+/* Section titles – consistent Title Case styling */
+.dashboard-overview .shell-page-header {
+    text-align: left;
+    margin-bottom: 24px;
+    padding-left: 0;
+}
+
+.dashboard-overview .shell-page-header h1,
+.dashboard-overview .shell-card-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 0;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-overview .shell-page-header h1 {
+    margin-bottom: 6px;
+}
+
+.dashboard-overview .shell-page-header p {
+    font-size: 14px;
+    color: #607d8b;
+}
+
+/* Top section: balanced two-column grid, reduced gap */
+.dashboard-overview .shell-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: stretch;
+    margin-bottom: 28px;
+}
+
+.dashboard-overview .shell-hero-main {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.dashboard-overview .shell-hero-main h2,
+.dashboard-overview .shell-hero-main p,
+.dashboard-overview .shell-hero-main .shell-hero-kicker {
+    text-align: left;
+}
+
+.dashboard-overview .shell-hero-main h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.dashboard-overview .shell-hero-main p.shell-hero-subtext {
+    margin-bottom: 16px;
+}
+
+.dashboard-overview .shell-hero-actions {
+    margin-top: 4px;
+}
+
+.dashboard-overview .shell-hero-side {
+    display: flex;
+    justify-content: stretch;
+}
+
+.dashboard-overview .shell-hero-side .shell-hero-card {
+    width: 100%;
+}
+
+/* Section grid: consistent width and alignment */
+.dashboard-overview .shell-section-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.dashboard-overview .shell-section-grid .shell-card {
+    padding: 18px 20px;
+}
+
+.dashboard-overview .shell-section-grid .shell-card-header {
+    margin-bottom: 14px;
+}
+
+/* Quick Actions: lighter, cleaner appearance */
+.dashboard-overview .shell-quick-actions {
+    gap: 8px;
+}
+
+.dashboard-overview .shell-quick-action {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fafcfb;
+    border: 1px solid rgba(200, 230, 201, 0.5);
+    box-shadow: none;
+}
+
+.dashboard-overview .shell-quick-action:hover {
+    background: #f1f8f4;
+    border-color: #c8e6c9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+}
+
+.dashboard-overview .shell-quick-icon {
+    background: rgba(232, 245, 233, 0.8);
+}
+
+/* Government Schemes: compact list, aligned View details */
+.dashboard-overview .shell-card-schemes {
+    min-height: auto;
+}
+
+.dashboard-overview .shell-scheme-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dashboard-overview .shell-scheme-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 4px 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #eceff1;
+}
+
+.dashboard-overview .shell-scheme-item:last-child {
+    border-bottom: none;
+}
+
+.dashboard-overview .shell-scheme-item .shell-scheme-title {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.dashboard-overview .shell-scheme-item .shell-scheme-meta {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.dashboard-overview .shell-scheme-item .shell-card-footer {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    margin-top: 0;
+}
+
+.dashboard-overview .shell-scheme-item .shell-card-footer .shell-btn {
+    white-space: nowrap;
+}
+
+.dashboard-overview .shell-card-schemes > .shell-card-footer {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #eceff1;
+}
+
+.dashboard-overview .shell-card-schemes > .shell-card-footer a.shell-btn-primary {
+    color: #ffffff !important;
+}
+
+.dashboard-overview .shell-card-schemes > .shell-card-footer a.shell-btn-primary:hover {
+    color: #ffffff !important;
+}
+
+/* Empty states and card footer spacing */
+.dashboard-overview .shell-section-grid .shell-card-footer {
+    margin-top: 14px;
+}
+
+.dashboard-overview .shell-empty-state {
+    padding: 24px 0;
+}
+
+.dashboard-overview .shell-empty-schemes {
+    padding: 20px 0;
+}
+
 /* Hero / welcome hierarchy */
 .shell-hero {
     display: grid;
@@ -2508,6 +2846,80 @@ body {
     font-size: 13px;
 }
 
+/* -----------------------------------------
+   Validation & Error Display (app-wide)
+----------------------------------------- */
+.validation-error {
+    font-size: 12px;
+    color: #c62828;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.validation-error::before {
+    content: "⚠";
+}
+
+.field-invalid input,
+.field-invalid textarea,
+.field-invalid .shell-input,
+.field-invalid .shell-textarea {
+    border-color: #e53935 !important;
+    background-color: #fff5f5 !important;
+}
+
+.field-invalid .predict-dropzone,
+.predict-dropzone.field-invalid {
+    border-color: #e53935 !important;
+    background-color: #fff5f5 !important;
+}
+
+.auth-card .field-invalid input {
+    border-color: #e53935 !important;
+    background-color: #fff5f5 !important;
+}
+
+.auth-field-wrap {
+    margin-bottom: 12px;
+}
+
+.auth-field-wrap .validation-error {
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+/* Flash messages */
+.flash-messages {
+    margin-bottom: 16px;
+}
+
+.flash-message {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.flash-message.flash-success {
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    color: #2e7d32;
+}
+
+.flash-message.flash-danger {
+    background: #ffebee;
+    border: 1px solid #ffcdd2;
+    color: #c62828;
+}
+
+.flash-message.flash-info {
+    background: #e3f2fd;
+    border: 1px solid #90caf9;
+    color: #1565c0;
+}
+
 .shell-form-actions {
     margin-top: 20px;
     padding-top: 14px;
@@ -2588,9 +3000,34 @@ body {
 
 /* Responsive layout tweaks */
 @media (max-width: 1024px) {
+    .dashboard-overview .shell-section-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-overview .shell-hero {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .dashboard-overview .shell-hero-side .shell-hero-card {
+        min-height: auto;
+    }
 }
 
 @media (max-width: 800px) {
+    .admin-analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-analytics-stats {
+        order: 2;
+    }
+
+    .admin-analytics-filter {
+        order: 1;
+    }
+
     .shell-nav-center {
         display: none;
     }
@@ -2634,6 +3071,40 @@ body {
     .shell-section-grid {
         grid-template-columns: 1fr;
     }
+
+    .dashboard-overview .shell-hero {
+        grid-template-columns: 1fr;
+        margin-bottom: 24px;
+        gap: 16px;
+    }
+
+    .dashboard-overview .shell-hero-main {
+        order: 1;
+    }
+
+    .dashboard-overview .shell-hero-side {
+        order: 2;
+    }
+
+    .dashboard-overview .shell-section-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .dashboard-overview .shell-page-header {
+        margin-bottom: 20px;
+    }
+
+    .dashboard-overview .shell-scheme-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .dashboard-overview .shell-scheme-item .shell-card-footer {
+        grid-column: 1;
+        grid-row: auto;
+        align-self: flex-start;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2659,6 +3130,22 @@ body {
 
     .shell-table {
         font-size: 12px;
+    }
+
+    .dashboard-overview .shell-page-header h1 {
+        font-size: 18px;
+    }
+
+    .dashboard-overview .shell-hero-main h2 {
+        font-size: 20px;
+    }
+
+    .dashboard-overview .shell-section-grid .shell-card {
+        padding: 16px;
+    }
+
+    .dashboard-overview .shell-scheme-item {
+        padding: 12px 0;
     }
 }
 

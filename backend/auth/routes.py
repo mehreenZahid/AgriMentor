@@ -1,3 +1,6 @@
+import re
+import logging
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
@@ -5,6 +8,9 @@ from models import User
 
 
 auth_bp = Blueprint("auth", __name__)
+logger = logging.getLogger(__name__)
+EMAIL_REGEX = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+MIN_PASSWORD_LEN = 8
 
 
 # ---------------------------------------------------
@@ -91,20 +97,42 @@ def register_page():
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
-    name = request.form["name"]
-    email = request.form["email"]
-    password = request.form["password"]
+    name = (request.form.get("name") or "").strip()
+    email = (request.form.get("email") or "").strip()
+    password = request.form.get("password") or ""
     role = "farmer"
 
+    if not name:
+        flash("Please enter your full name.", "danger")
+        return redirect(url_for("auth.register_page"))
+    if len(name) < 2:
+        flash("Name must be at least 2 characters.", "danger")
+        return redirect(url_for("auth.register_page"))
+    if not email:
+        flash("Please enter your email address.", "danger")
+        return redirect(url_for("auth.register_page"))
+    if not EMAIL_REGEX.match(email):
+        flash("Please enter a valid email address.", "danger")
+        return redirect(url_for("auth.register_page"))
+    if not password:
+        flash("Please enter a password.", "danger")
+        return redirect(url_for("auth.register_page"))
+    if len(password) < MIN_PASSWORD_LEN:
+        flash(f"Password must be at least {MIN_PASSWORD_LEN} characters.", "danger")
+        return redirect(url_for("auth.register_page"))
 
     existing_user = User.get_by_email(email)
     if existing_user:
         flash("Email already registered.", "danger")
         return redirect(url_for("auth.register_page"))
 
-    hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
-
-    User.create(name, email, hashed_password, role)
+    try:
+        hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
+        User.create(name, email, hashed_password, role)
+    except Exception as ex:
+        logger.exception("Registration failed")
+        flash("Something went wrong. Please try again.", "danger")
+        return redirect(url_for("auth.register_page"))
 
     flash("Registration successful. Please login.", "success")
     return redirect(url_for("auth.login_page"))
@@ -129,8 +157,18 @@ def login_page():
 
     if request.method == "POST":
 
-        email = request.form.get("email")
-        password = request.form.get("password")
+        email = (request.form.get("email") or "").strip()
+        password = request.form.get("password") or ""
+
+        if not email:
+            flash("Please enter your email address.", "danger")
+            return render_template("login.html")
+        if not EMAIL_REGEX.match(email):
+            flash("Please enter a valid email address.", "danger")
+            return render_template("login.html")
+        if not password:
+            flash("Please enter your password.", "danger")
+            return render_template("login.html")
 
         user = User.get_by_email(email)
 

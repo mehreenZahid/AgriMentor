@@ -7,28 +7,119 @@
 <body class="auth-page">
 
 <div class="auth-shell">
-    <div class="auth-card">
-        <h2>Create your account</h2>
-        <p class="auth-subtitle">Join AgriMentor to get crop insights and access to schemes.</p>
+    <div class="auth-layout">
 
-        <form method="POST" action="/register">
+        <!-- LEFT: Illustration / brand -->
+        <div class="auth-illustration">
+            <div class="auth-illustration-overlay">
+                <div class="auth-illustration-copy">
+                    <span class="auth-pill">AgriMentor</span>
+                    <h1>Grow with data‑driven guidance.</h1>
+                    <p>Onboard in minutes and start using AI to understand crop health, risks, and government support tailored to your farms.</p>
+                </div>
+            </div>
+        </div>
 
-            <input type="text" name="name" placeholder="Full name" required>
+        <!-- RIGHT: Registration form -->
+        <div class="auth-form-panel">
+            <div class="auth-card">
+                <h2>Create your account</h2>
+                <p class="auth-subtitle">Join AgriMentor to get crop insights and access to schemes.</p>
 
-            <input type="email" name="email" placeholder="Email address" required>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                    <div class="flash-message flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
 
-            <input type="password" name="password" placeholder="Password" required>
+                <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm" novalidate>
+                    <div class="auth-field-wrap" id="nameWrap">
+                        <input type="text" name="name" id="regName" placeholder="Full name" required
+                               autocomplete="name" minlength="2">
+                        <span class="validation-error" id="nameError" role="alert"></span>
+                    </div>
 
-            <button type="submit">Register</button>
-        </form>
+                    <div class="auth-field-wrap" id="emailWrap">
+                        <input type="email" name="email" id="regEmail" placeholder="Email address" required
+                               autocomplete="email">
+                        <span class="validation-error" id="emailError" role="alert"></span>
+                    </div>
 
-        <p class="auth-footer-text">
-            Already have an account?
-            <a href="/login">Login here</a>
-        </p>
+                    <div class="auth-field-wrap" id="passwordWrap">
+                        <input type="password" name="password" id="regPassword" placeholder="Password" required
+                               autocomplete="new-password" minlength="8">
+                        <span class="validation-error" id="passwordError" role="alert"></span>
+                    </div>
+
+                    <button type="submit">Register</button>
+                </form>
+
+                <p class="auth-footer-text">
+                    Already have an account?
+                    <a href="/login">Login here</a>
+                </p>
+            </div>
+        </div>
 
     </div>
 </div>
 
+<script>
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    var name = document.getElementById('regName');
+    var email = document.getElementById('regEmail');
+    var password = document.getElementById('regPassword');
+    var nameWrap = document.getElementById('nameWrap');
+    var emailWrap = document.getElementById('emailWrap');
+    var passwordWrap = document.getElementById('passwordWrap');
+    var nameError = document.getElementById('nameError');
+    var emailError = document.getElementById('emailError');
+    var passwordError = document.getElementById('passwordError');
+    var valid = true;
+
+    [nameWrap, emailWrap, passwordWrap].forEach(function(w) { w.classList.remove('field-invalid'); });
+    [nameError, emailError, passwordError].forEach(function(el) { el.textContent = ''; });
+
+    var nameVal = (name.value || '').trim();
+    var emailVal = (email.value || '').trim();
+    var passwordVal = password.value || '';
+
+    if (!nameVal) {
+        nameWrap.classList.add('field-invalid');
+        nameError.textContent = 'Please enter your full name.';
+        valid = false;
+    } else if (nameVal.length < 2) {
+        nameWrap.classList.add('field-invalid');
+        nameError.textContent = 'Name must be at least 2 characters.';
+        valid = false;
+    }
+
+    if (!emailVal) {
+        emailWrap.classList.add('field-invalid');
+        emailError.textContent = 'Please enter your email address.';
+        valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        emailWrap.classList.add('field-invalid');
+        emailError.textContent = 'Please enter a valid email address.';
+        valid = false;
+    }
+
+    if (!passwordVal) {
+        passwordWrap.classList.add('field-invalid');
+        passwordError.textContent = 'Please enter a password.';
+        valid = false;
+    } else if (passwordVal.length < 8) {
+        passwordWrap.classList.add('field-invalid');
+        passwordError.textContent = 'Password must be at least 8 characters.';
+        valid = false;
+    }
+
+    if (!valid) e.preventDefault();
+});
+</script>
 </body>
 </html>

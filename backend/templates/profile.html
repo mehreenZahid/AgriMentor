@@ -11,10 +11,11 @@
 </section>
 
 <section class="shell-card shell-card-narrow">
-    <form method="POST" class="shell-form">
-        <label>
+    <form method="POST" class="shell-form" id="profileForm" novalidate>
+        <label id="nameLabelWrap">
             <span>Name</span>
-            <input type="text" name="name" value="{{ user.name }}" required>
+            <input type="text" name="name" id="profileName" value="{{ user.name }}" required minlength="2">
+            <span class="validation-error" id="profileNameError" role="alert"></span>
         </label>
 
         <label>
@@ -30,4 +31,23 @@
         <button type="submit" class="shell-btn shell-btn-primary">Save changes</button>
     </form>
 </section>
+<script>
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+    var name = document.getElementById('profileName');
+    var wrap = document.getElementById('nameLabelWrap');
+    var err = document.getElementById('profileNameError');
+    var val = (name.value || '').trim();
+    wrap.classList.remove('field-invalid');
+    err.textContent = '';
+    if (!val) {
+        wrap.classList.add('field-invalid');
+        err.textContent = 'Please enter your name.';
+        e.preventDefault();
+    } else if (val.length < 2) {
+        wrap.classList.add('field-invalid');
+        err.textContent = 'Name must be at least 2 characters.';
+        e.preventDefault();
+    }
+});
+</script>
 {% endblock %}

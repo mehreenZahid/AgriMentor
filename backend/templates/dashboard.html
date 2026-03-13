@@ -3,8 +3,9 @@
 {% block title %}Dashboard | AgriMentor{% endblock %}
 
 {% block page_content %}
+<div class="dashboard-overview">
 <div class="shell-page-header">
-    <h1>Dashboard overview</h1>
+    <h1>Dashboard Overview</h1>
     <p>Key actions, latest predictions, and schemes for your farm.</p>
 </div>
 
@@ -53,7 +54,7 @@
 <section class="shell-section-grid">
     <div class="shell-card">
         <div class="shell-card-header">
-            <h2>Quick actions</h2>
+            <h2>Quick Actions</h2>
             <span class="shell-pill">Farmer tools</span>
         </div>
         <ul class="shell-quick-actions">
@@ -89,7 +90,7 @@
 
     <div class="shell-card shell-card-history">
         <div class="shell-card-header">
-            <h2>Prediction history</h2>
+            <h2>Prediction History</h2>
         </div>
         {% if recent_predictions %}
             <div class="shell-table-wrapper">
@@ -132,13 +133,13 @@
 
     <div class="shell-card shell-card-schemes">
         <div class="shell-card-header">
-            <h2>Government schemes</h2>
+            <h2>Government Schemes</h2>
             <span class="shell-pill shell-pill-soft">Support</span>
         </div>
         {% if schemes %}
-            <ul class="shell-list">
+            <ul class="shell-list shell-scheme-list">
                 {% for s in schemes %}
-                <li>
+                <li class="shell-scheme-item">
                     <div class="shell-scheme-title">
                         <a href="{{ url_for('scheme_detail', scheme_id=s.id) }}">{{ s.title }}</a>
                     </div>
@@ -174,4 +175,5 @@
         {% endif %}
     </div>
 </section>
+</div>
 {% endblock %}

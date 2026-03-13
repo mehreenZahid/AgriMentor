@@ -33,7 +33,7 @@
             </div>
         {% endif %}
 
-        <form method="POST" class="shell-form">
+        <form method="POST" class="shell-form" id="schemeForm" novalidate>
             <!-- Core information -->
             <section class="shell-form-section">
                 <header class="shell-form-section-header">
@@ -42,7 +42,7 @@
                 </header>
 
                 <div class="shell-form-grid shell-form-grid-2">
-                    <div class="shell-form-field">
+                    <div class="shell-form-field" id="titleFieldWrap">
                         <label class="shell-field-label" for="title">
                             <span>Title</span>
                             <span class="shell-required">*</span>
@@ -56,6 +56,7 @@
                             value="{{ scheme.title or '' }}"
                             placeholder="e.g. PM-Kisan Income Support"
                         >
+                        <span class="validation-error" id="titleError" role="alert"></span>
                         <p class="shell-field-hint">This is what farmers will see first in the schemes list.</p>
                     </div>
 
@@ -118,7 +119,7 @@
                 </header>
 
                 <div class="shell-form-inline">
-                    <div class="shell-form-field">
+                    <div class="shell-form-field" id="deadlineFieldWrap">
                         <label class="shell-field-label" for="deadline">
                             <span>Deadline</span>
                         </label>
@@ -129,6 +130,7 @@
                             class="shell-input"
                             value="{{ scheme.deadline or '' }}"
                         >
+                        <span class="validation-error" id="deadlineError" role="alert"></span>
                         <p class="shell-field-hint">Leave blank if the scheme has no fixed end date.</p>
                     </div>
 
@@ -162,5 +164,40 @@
         </form>
     </div>
 </div>
+<script>
+document.getElementById('schemeForm').addEventListener('submit', function(e) {
+    var title = document.getElementById('title');
+    var deadline = document.getElementById('deadline');
+    var titleWrap = document.getElementById('titleFieldWrap');
+    var deadlineWrap = document.getElementById('deadlineFieldWrap');
+    var titleErr = document.getElementById('titleError');
+    var deadlineErr = document.getElementById('deadlineError');
+    var valid = true;
+
+    titleWrap.classList.remove('field-invalid');
+    deadlineWrap.classList.remove('field-invalid');
+    titleErr.textContent = '';
+    deadlineErr.textContent = '';
+
+    var titleVal = (title.value || '').trim();
+    if (!titleVal) {
+        titleWrap.classList.add('field-invalid');
+        titleErr.textContent = 'Title is required.';
+        valid = false;
+    }
+
+    var deadlineVal = (deadline.value || '').trim();
+    if (deadlineVal) {
+        var d = new Date(deadlineVal);
+        if (isNaN(d.getTime())) {
+            deadlineWrap.classList.add('field-invalid');
+            deadlineErr.textContent = 'Please enter a valid date (YYYY-MM-DD).';
+            valid = false;
+        }
+    }
+
+    if (!valid) e.preventDefault();
+});
+</script>
 {% endblock %}
 

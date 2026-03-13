@@ -9,36 +9,107 @@
 <body class="auth-page">
 
     <div class="auth-shell">
-        <div class="auth-card">
-            <h2>Welcome back</h2>
-            <p class="auth-subtitle">Sign in to continue to your AgriMentor dashboard.</p>
+        <div class="auth-layout">
 
-            <!-- LOGIN FORM -->
-            <form method="POST" action="{{ url_for('auth.login_page') }}">
-
-                <input type="email" name="email" placeholder="Email address" required>
-
-                <input type="password" name="password" placeholder="Password" required>
-
-                <button type="submit">Login</button>
-
-            </form>
-
-            <!-- GOOGLE LOGIN BUTTON -->
-            <div class="auth-secondary-action">
-                <a href="{{ url_for('auth.google_login') }}" class="auth-google-btn">
-                    Continue with Google
-                </a>
+            <!-- LEFT: Illustration / brand -->
+            <div class="auth-illustration">
+                <div class="auth-illustration-overlay">
+                    <div class="auth-illustration-copy">
+                        <span class="auth-pill">AgriMentor</span>
+                        <h1>Smarter decisions for every field.</h1>
+                        <p>Use AI-powered insights to protect your crops, boost yield, and unlock the right schemes at the right time.</p>
+                    </div>
+                </div>
             </div>
 
-            <p class="auth-footer-text">
-                Don’t have an account?
-                <a href="{{ url_for('auth.register_page') }}">Register here</a>
-            </p>
+            <!-- RIGHT: Login form -->
+            <div class="auth-form-panel">
+                <div class="auth-card">
+                    <h2>Welcome back</h2>
+                    <p class="auth-subtitle">Sign in to continue to your AgriMentor dashboard.</p>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, msg in messages %}
+                        <div class="flash-message flash-{{ category }}">{{ msg }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+
+                    <!-- LOGIN FORM -->
+                    <form method="POST" action="{{ url_for('auth.login_page') }}" id="loginForm" novalidate>
+                        <div class="auth-field-wrap" id="emailWrap">
+                            <input type="email" name="email" id="email" placeholder="Email address" required
+                                   autocomplete="email">
+                            <span class="validation-error" id="emailError" role="alert"></span>
+                        </div>
+
+                        <div class="auth-field-wrap" id="passwordWrap">
+                            <input type="password" name="password" id="password" placeholder="Password" required
+                                   autocomplete="current-password">
+                            <span class="validation-error" id="passwordError" role="alert"></span>
+                        </div>
+
+                        <button type="submit">Login</button>
+                    </form>
+
+                    <!-- GOOGLE LOGIN BUTTON -->
+                    <div class="auth-secondary-action">
+                        <a href="{{ url_for('auth.google_login') }}" class="auth-google-btn">
+                            Continue with Google
+                        </a>
+                    </div>
+
+                    <p class="auth-footer-text">
+                        Don’t have an account?
+                        <a href="{{ url_for('auth.register_page') }}">Register here</a>
+                    </p>
+
+                </div>
+            </div>
 
         </div>
     </div>
 
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    var email = document.getElementById('email');
+    var password = document.getElementById('password');
+    var emailWrap = document.getElementById('emailWrap');
+    var passwordWrap = document.getElementById('passwordWrap');
+    var emailError = document.getElementById('emailError');
+    var passwordError = document.getElementById('passwordError');
+    var valid = true;
+
+    emailWrap.classList.remove('field-invalid');
+    passwordWrap.classList.remove('field-invalid');
+    emailError.textContent = '';
+    passwordError.textContent = '';
+
+    var emailVal = (email.value || '').trim();
+    var passwordVal = (password.value || '').trim();
+
+    if (!emailVal) {
+        emailWrap.classList.add('field-invalid');
+        emailError.textContent = 'Please enter your email address.';
+        valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        emailWrap.classList.add('field-invalid');
+        emailError.textContent = 'Please enter a valid email address.';
+        valid = false;
+    }
+
+    if (!passwordVal) {
+        passwordWrap.classList.add('field-invalid');
+        passwordError.textContent = 'Please enter your password.';
+        valid = false;
+    }
+
+    if (!valid) e.preventDefault();
+});
+</script>
 </body>
 
 </html>

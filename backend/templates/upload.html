@@ -40,8 +40,8 @@
             </div>
 
             <div class="predict-form">
-                <form action="/upload" method="POST" enctype="multipart/form-data" class="predict-form-inner">
-                    <input type="file" name="image" id="imageInput" hidden required>
+                <form action="/upload" method="POST" enctype="multipart/form-data" class="predict-form-inner" id="uploadForm">
+                    <input type="file" name="image" id="imageInput" hidden accept=".jpg,.jpeg,.png">
 
                     <div id="uploadDropzone" class="predict-dropzone" aria-label="Upload crop image">
                         <div class="predict-dropzone-icon">📷</div>
@@ -58,6 +58,7 @@
                     <p class="file-hint">
                         Upload a clear, well‑framed photo of the affected part of the plant. Avoid blurry or very dark images.
                     </p>
+                    <p class="validation-error" id="uploadError" role="alert" style="display:none;"></p>
 
                     <div class="predict-preview-shell" id="previewShell" hidden>
                         <div class="predict-preview-header">
@@ -138,13 +139,6 @@
         reader.readAsDataURL(file);
     }
 
-    imageInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            updatePreview(file);
-        }
-    });
-
     if (dropzone) {
         ['dragenter', 'dragover'].forEach(evtName => {
             dropzone.addEventListener(evtName, (event) => {
@@ -166,10 +160,76 @@
             const dt = event.dataTransfer;
             if (!dt || !dt.files || !dt.files.length) return;
             const file = dt.files[0];
-
-            imageInput.files = dt.files;
-            updatePreview(file);
+            if (validateFile(file)) {
+                imageInput.files = dt.files;
+                updatePreview(file);
+                clearUploadError();
+            }
         });
     }
-</script>
+
+    var ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+    var MAX_SIZE_MB = 10;
+    var MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+    function validateFile(file) {
+        var errEl = document.getElementById('uploadError');
+        var dropEl = document.getElementById('uploadDropzone');
+        if (!file) {
+            showUploadError('Please select an image to upload.');
+            dropEl.classList.add('field-invalid');
+            return false;
+        }
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            showUploadError('Please upload a valid image file (JPG or PNG only).');
+            dropEl.classList.add('field-invalid');
+            return false;
+        }
+        if (file.size > MAX_SIZE_BYTES) {
+            showUploadError('File size must be less than ' + MAX_SIZE_MB + ' MB.');
+            dropEl.classList.add('field-invalid');
+            return false;
+        }
+        dropEl.classList.remove('field-invalid');
+        clearUploadError();
+        return true;
+    }
+
+    function showUploadError(msg) {
+        var err = document.getElementById('uploadError');
+        err.textContent = msg;
+        err.style.display = 'block';
+    }
+    function clearUploadError() {
+        var err = document.getElementById('uploadError');
+        err.textContent = '';
+        err.style.display = 'none';
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        var file = imageInput.files[0];
+        var dropEl = document.getElementById('uploadDropzone');
+        clearUploadError();
+        dropEl.classList.remove('field-invalid');
+        if (!file) {
+            e.preventDefault();
+            showUploadError('Please select an image to upload.');
+            dropEl.classList.add('field-invalid');
+            return;
+        }
+        if (!validateFile(file)) {
+            e.preventDefault();
+        }
+    });
+
+    imageInput.addEventListener('change', function() {
+        var file = this.files[0];
+        if (file && validateFile(file)) {
+            updatePreview(file);
+        } else if (file) {
+            this.value = '';
+            previewShell.hidden = true;
+            previewShell.setAttribute('hidden', '');
+        }
+    });
 {% endblock %}

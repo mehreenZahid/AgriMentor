@@ -9,8 +9,8 @@
         <p>Overview of farmer onboarding, total predictions, and disease distribution.</p>
     </div>
 
-    <div class="shell-section-grid">
-        <div class="shell-card">
+    <div class="admin-analytics-grid">
+        <div class="admin-analytics-filter shell-card">
             <div class="shell-card-header">
                 <h2>Filter by date</h2>
             </div>
@@ -33,11 +33,20 @@
             </form>
         </div>
 
-        <div class="shell-card">
-            <div class="shell-card-header">
-                <h2>Total predictions</h2>
+        <div class="admin-analytics-stats">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <h2>Total predictions</h2>
+                </div>
+                <p class="admin-stat-number">{{ prediction_count }}</p>
             </div>
-            <p class="admin-stat-number">{{ prediction_count }}</p>
+
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <h2>Total Farmers</h2>
+                </div>
+                <p class="admin-stat-number">{{ total_farmers_count }}</p>
+            </div>
         </div>
     </div>
 
