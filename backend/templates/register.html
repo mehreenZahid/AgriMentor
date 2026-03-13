@@ -69,7 +69,8 @@
 </div>
 
 <script>
-document.getElementById('registerForm').addEventListener('submit', function(e) {
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('registerForm');
     var name = document.getElementById('regName');
     var email = document.getElementById('regEmail');
     var password = document.getElementById('regPassword');
@@ -79,46 +80,70 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
     var nameError = document.getElementById('nameError');
     var emailError = document.getElementById('emailError');
     var passwordError = document.getElementById('passwordError');
-    var valid = true;
 
-    [nameWrap, emailWrap, passwordWrap].forEach(function(w) { w.classList.remove('field-invalid'); });
-    [nameError, emailError, passwordError].forEach(function(el) { el.textContent = ''; });
-
-    var nameVal = (name.value || '').trim();
-    var emailVal = (email.value || '').trim();
-    var passwordVal = password.value || '';
-
-    if (!nameVal) {
-        nameWrap.classList.add('field-invalid');
-        nameError.textContent = 'Please enter your full name.';
-        valid = false;
-    } else if (nameVal.length < 2) {
-        nameWrap.classList.add('field-invalid');
-        nameError.textContent = 'Name must be at least 2 characters.';
-        valid = false;
+    function validateName() {
+        var valid = true;
+        nameWrap.classList.remove('field-invalid');
+        nameError.textContent = '';
+        var val = (name.value || '').trim();
+        if (!val) {
+            nameWrap.classList.add('field-invalid');
+            nameError.textContent = 'Please enter your full name.';
+            valid = false;
+        } else if (val.length < 2) {
+            nameWrap.classList.add('field-invalid');
+            nameError.textContent = 'Name must be at least 2 characters.';
+            valid = false;
+        }
+        return valid;
     }
 
-    if (!emailVal) {
-        emailWrap.classList.add('field-invalid');
-        emailError.textContent = 'Please enter your email address.';
-        valid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-        emailWrap.classList.add('field-invalid');
-        emailError.textContent = 'Please enter a valid email address.';
-        valid = false;
+    function validateEmail() {
+        var valid = true;
+        emailWrap.classList.remove('field-invalid');
+        emailError.textContent = '';
+        var val = (email.value || '').trim();
+        if (!val) {
+            emailWrap.classList.add('field-invalid');
+            emailError.textContent = 'Please enter your email address.';
+            valid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+            emailWrap.classList.add('field-invalid');
+            emailError.textContent = 'Please enter a valid email address.';
+            valid = false;
+        }
+        return valid;
     }
 
-    if (!passwordVal) {
-        passwordWrap.classList.add('field-invalid');
-        passwordError.textContent = 'Please enter a password.';
-        valid = false;
-    } else if (passwordVal.length < 8) {
-        passwordWrap.classList.add('field-invalid');
-        passwordError.textContent = 'Password must be at least 8 characters.';
-        valid = false;
+    function validatePassword() {
+        var valid = true;
+        passwordWrap.classList.remove('field-invalid');
+        passwordError.textContent = '';
+        var val = password.value || '';
+        if (!val) {
+            passwordWrap.classList.add('field-invalid');
+            passwordError.textContent = 'Please enter a password.';
+            valid = false;
+        } else if (val.length < 8) {
+            passwordWrap.classList.add('field-invalid');
+            passwordError.textContent = 'Password must be at least 8 characters.';
+            valid = false;
+        }
+        return valid;
     }
 
-    if (!valid) e.preventDefault();
+    name.addEventListener('blur', validateName);
+    email.addEventListener('blur', validateEmail);
+    password.addEventListener('blur', validatePassword);
+
+    form.addEventListener('submit', function(e) {
+        var isNameValid = validateName();
+        var isEmailValid = validateEmail();
+        var isPasswordValid = validatePassword();
+        if (!isNameValid || !isEmailValid || !isPasswordValid) {
+            e.preventDefault();
+        }
+    });
 });
 </script>
 </body>

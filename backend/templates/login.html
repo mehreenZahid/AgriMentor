@@ -74,40 +74,55 @@
     </div>
 
 <script>
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('loginForm');
     var email = document.getElementById('email');
     var password = document.getElementById('password');
     var emailWrap = document.getElementById('emailWrap');
     var passwordWrap = document.getElementById('passwordWrap');
     var emailError = document.getElementById('emailError');
     var passwordError = document.getElementById('passwordError');
-    var valid = true;
 
-    emailWrap.classList.remove('field-invalid');
-    passwordWrap.classList.remove('field-invalid');
-    emailError.textContent = '';
-    passwordError.textContent = '';
-
-    var emailVal = (email.value || '').trim();
-    var passwordVal = (password.value || '').trim();
-
-    if (!emailVal) {
-        emailWrap.classList.add('field-invalid');
-        emailError.textContent = 'Please enter your email address.';
-        valid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-        emailWrap.classList.add('field-invalid');
-        emailError.textContent = 'Please enter a valid email address.';
-        valid = false;
+    function validateEmail() {
+        var valid = true;
+        emailWrap.classList.remove('field-invalid');
+        emailError.textContent = '';
+        var val = (email.value || '').trim();
+        if (!val) {
+            emailWrap.classList.add('field-invalid');
+            emailError.textContent = 'Please enter your email address.';
+            valid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+            emailWrap.classList.add('field-invalid');
+            emailError.textContent = 'Please enter a valid email address.';
+            valid = false;
+        }
+        return valid;
     }
 
-    if (!passwordVal) {
-        passwordWrap.classList.add('field-invalid');
-        passwordError.textContent = 'Please enter your password.';
-        valid = false;
+    function validatePassword() {
+        var valid = true;
+        passwordWrap.classList.remove('field-invalid');
+        passwordError.textContent = '';
+        var val = (password.value || '').trim();
+        if (!val) {
+            passwordWrap.classList.add('field-invalid');
+            passwordError.textContent = 'Please enter your password.';
+            valid = false;
+        }
+        return valid;
     }
 
-    if (!valid) e.preventDefault();
+    email.addEventListener('blur', validateEmail);
+    password.addEventListener('blur', validatePassword);
+
+    form.addEventListener('submit', function(e) {
+        var isEmailValid = validateEmail();
+        var isPasswordValid = validatePassword();
+        if (!isEmailValid || !isPasswordValid) {
+            e.preventDefault();
+        }
+    });
 });
 </script>
 </body>

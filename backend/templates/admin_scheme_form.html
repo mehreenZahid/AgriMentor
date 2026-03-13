@@ -165,38 +165,54 @@
     </div>
 </div>
 <script>
-document.getElementById('schemeForm').addEventListener('submit', function(e) {
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('schemeForm');
     var title = document.getElementById('title');
     var deadline = document.getElementById('deadline');
     var titleWrap = document.getElementById('titleFieldWrap');
     var deadlineWrap = document.getElementById('deadlineFieldWrap');
     var titleErr = document.getElementById('titleError');
     var deadlineErr = document.getElementById('deadlineError');
-    var valid = true;
 
-    titleWrap.classList.remove('field-invalid');
-    deadlineWrap.classList.remove('field-invalid');
-    titleErr.textContent = '';
-    deadlineErr.textContent = '';
-
-    var titleVal = (title.value || '').trim();
-    if (!titleVal) {
-        titleWrap.classList.add('field-invalid');
-        titleErr.textContent = 'Title is required.';
-        valid = false;
-    }
-
-    var deadlineVal = (deadline.value || '').trim();
-    if (deadlineVal) {
-        var d = new Date(deadlineVal);
-        if (isNaN(d.getTime())) {
-            deadlineWrap.classList.add('field-invalid');
-            deadlineErr.textContent = 'Please enter a valid date (YYYY-MM-DD).';
+    function validateTitle() {
+        var valid = true;
+        titleWrap.classList.remove('field-invalid');
+        titleErr.textContent = '';
+        var val = (title.value || '').trim();
+        if (!val) {
+            titleWrap.classList.add('field-invalid');
+            titleErr.textContent = 'Title is required.';
             valid = false;
         }
+        return valid;
     }
 
-    if (!valid) e.preventDefault();
+    function validateDeadline() {
+        var valid = true;
+        deadlineWrap.classList.remove('field-invalid');
+        deadlineErr.textContent = '';
+        var val = (deadline.value || '').trim();
+        if (val) {
+            var d = new Date(val);
+            if (isNaN(d.getTime())) {
+                deadlineWrap.classList.add('field-invalid');
+                deadlineErr.textContent = 'Please enter a valid date (YYYY-MM-DD).';
+                valid = false;
+            }
+        }
+        return valid;
+    }
+
+    title.addEventListener('blur', validateTitle);
+    deadline.addEventListener('blur', validateDeadline);
+
+    form.addEventListener('submit', function(e) {
+        var isTitleValid = validateTitle();
+        var isDeadlineValid = validateDeadline();
+        if (!isTitleValid || !isDeadlineValid) {
+            e.preventDefault();
+        }
+    });
 });
 </script>
 {% endblock %}

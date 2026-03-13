@@ -32,22 +32,36 @@
     </form>
 </section>
 <script>
-document.getElementById('profileForm').addEventListener('submit', function(e) {
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('profileForm');
     var name = document.getElementById('profileName');
     var wrap = document.getElementById('nameLabelWrap');
     var err = document.getElementById('profileNameError');
-    var val = (name.value || '').trim();
-    wrap.classList.remove('field-invalid');
-    err.textContent = '';
-    if (!val) {
-        wrap.classList.add('field-invalid');
-        err.textContent = 'Please enter your name.';
-        e.preventDefault();
-    } else if (val.length < 2) {
-        wrap.classList.add('field-invalid');
-        err.textContent = 'Name must be at least 2 characters.';
-        e.preventDefault();
+
+    function validateName() {
+        var valid = true;
+        wrap.classList.remove('field-invalid');
+        err.textContent = '';
+        var val = (name.value || '').trim();
+        if (!val) {
+            wrap.classList.add('field-invalid');
+            err.textContent = 'Please enter your name.';
+            valid = false;
+        } else if (val.length < 2) {
+            wrap.classList.add('field-invalid');
+            err.textContent = 'Name must be at least 2 characters.';
+            valid = false;
+        }
+        return valid;
     }
+
+    name.addEventListener('blur', validateName);
+
+    form.addEventListener('submit', function(e) {
+        if (!validateName()) {
+            e.preventDefault();
+        }
+    });
 });
 </script>
 {% endblock %}

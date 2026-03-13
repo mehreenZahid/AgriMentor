@@ -184,6 +184,27 @@ button:hover {
     background-color: #fbfffc;
 }
 
+/* Validation styles */
+.field-invalid input,
+.field-invalid textarea,
+.field-invalid select,
+.field-invalid .predict-dropzone {
+    border-color: #d32f2f !important;
+    box-shadow: 0 0 0 1px rgba(211, 47, 47, 0.16) !important;
+}
+
+.validation-error {
+    color: #d32f2f;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+    min-height: 18px; /* reserves space so layout doesn't jump */
+}
+
+.validation-error:empty {
+    display: none !important;
+}
+
 .auth-card button {
     margin-top: 6px;
 }
@@ -2825,16 +2846,7 @@ body {
     outline: none;
 }
 
-/* Validation states using HTML5 validity */
-.shell-input[required]:not(:placeholder-shown):invalid {
-    border-color: #e53935;
-    background-color: #fff7f7;
-}
-
-.shell-input[required]:not(:placeholder-shown):valid {
-    border-color: #2e7d32;
-    background-color: #f4fbf5;
-}
+/* Validation states via custom JS instead of HTML5 valid/invalid hooks */
 
 .shell-banner-error {
     margin-bottom: 12px;
@@ -2856,6 +2868,11 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+/* Hide the entire error block (and its icon) when there's no error text */
+.validation-error:empty {
+    display: none !important;
 }
 
 .validation-error::before {
