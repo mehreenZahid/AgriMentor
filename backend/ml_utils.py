@@ -51,3 +51,53 @@ def predict_image(img_path):
 
     return predicted_class, round(confidence * 100, 2)
 
+from PIL import Image
+
+def detect_soil_type_from_image(img_path):
+    try:
+        # Open image and resize to a 50x50 block to average out colors easily
+        img = Image.open(img_path).convert('RGB')
+        img = img.resize((50, 50))
+        
+        # Calculate the average color
+        np_img = np.array(img)
+        avg_color = np.mean(np_img, axis=(0, 1))
+        r, g, b = avg_color
+
+        # Simple heuristic to determine soil type based on RGB
+        if r > 150 and g > 130 and b < 120:
+            return "Sandy"
+        elif r > 100 and g < 100 and b < 100:
+            return "Clay"
+        elif r < 100 and g < 100 and b < 100:
+            return "Loamy"
+        else:
+            return "Silt"
+            
+    except Exception as e:
+        print(f"Error processing soil image: {e}")
+        return "Loamy" # Default fallback
+
+def get_crop_recommendations(soil_type, season, water_availability):
+    mapping = {
+        "Sandy": ["Groundnut", "Watermelon", "Millets"],
+        "Clay": ["Rice", "Taro"],
+        "Loamy": ["Wheat", "Sugarcane", "Cotton"],
+        "Silt": ["Tomato", "Lettuce"]
+    }
+    
+    crops = mapping.get(soil_type, ["Wheat", "Maize", "Tomato"])
+    
+    explanation = f"These crops grow well in {soil_type.lower()} soil "
+    conditions = []
+    if water_availability:
+        conditions.append(f"with {water_availability.lower()} water availability")
+    if season:
+        conditions.append(f"during the {season.lower()} season")
+        
+    if conditions:
+        explanation += " and ".join(conditions) + "."
+    else:
+        explanation += "."
+        
+    return crops, explanation

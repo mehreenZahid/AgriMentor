@@ -1,0 +1,283 @@
+{% extends "layout.html" %}
+
+{% block title %}Soil Recommendation | AgriMentor{% endblock %}
+
+{% block page_content %}
+<div class="predict-page">
+    <div class="predict-shell">
+        <div class="predict-card">
+            <div class="predict-copy">
+                <h2>Get AI Crop Recommendations</h2>
+                <p class="predict-intro">
+                    Upload a picture of your soil or manually select its type. We'll recommend the best crops based on soil, season, and water availability.
+                </p>
+
+                <div class="predict-guidance">
+                    <div class="predict-guidance-column">
+                        <h3>Soil Image tips (Optional)</h3>
+                        <ul>
+                            <li>Take a close-up photo of the soil surface.</li>
+                            <li>Ensure good natural lighting to capture the true color.</li>
+                            <li>Avoid debris like heavy leaf cover in the shot.</li>
+                        </ul>
+                    </div>
+                    <div class="predict-guidance-column">
+                        <h3>Manual entry</h3>
+                        <ul>
+                            <li>If no photo is uploaded, we'll use your manual soil selection.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="predict-illustration">
+                    <div class="predict-illustration-badge">Smart Farming</div>
+                    <div class="predict-illustration-plant">🌱</div>
+                    <p>Make data-driven decisions on what to plant next.</p>
+                </div>
+            </div>
+
+            <div class="predict-form">
+                <form action="/soil-recommendation" method="POST" enctype="multipart/form-data" class="predict-form-inner" id="recommendForm" novalidate>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="soil_type" style="display:block; font-weight:600; margin-bottom:8px;">Manual Soil Type (if no image uploaded)</label>
+                        <select name="soil_type" id="soil_type" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit;">
+                            <option value="Loamy" {% if manual_soil_type == 'Loamy' %}selected{% endif %}>Loamy</option>
+                            <option value="Sandy" {% if manual_soil_type == 'Sandy' %}selected{% endif %}>Sandy</option>
+                            <option value="Clay" {% if manual_soil_type == 'Clay' %}selected{% endif %}>Clay</option>
+                            <option value="Silt" {% if manual_soil_type == 'Silt' %}selected{% endif %}>Silt</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px; display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label for="season" style="display:block; font-weight:600; margin-bottom:8px;">Season</label>
+                            <select name="season" id="season" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit;">
+                                <option value="Summer" {% if season == 'Summer' %}selected{% endif %}>Summer</option>
+                                <option value="Winter" {% if season == 'Winter' %}selected{% endif %}>Winter</option>
+                                <option value="Monsoon" {% if season == 'Monsoon' %}selected{% endif %}>Monsoon</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="water" style="display:block; font-weight:600; margin-bottom:8px;">Water Availability</label>
+                            <select name="water" id="water" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit;">
+                                <option value="High" {% if water == 'High' %}selected{% endif %}>High</option>
+                                <option value="Medium" {% if water == 'Medium' %}selected{% endif %}>Medium</option>
+                                <option value="Low" {% if water == 'Low' %}selected{% endif %}>Low</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                    
+                    <label style="display:block; font-weight:600; margin-bottom:8px;">Upload Soil Image (Optional)</label>
+                    <input type="file" name="image" id="imageInput" hidden accept=".jpg,.jpeg,.png">
+
+                    <div id="uploadDropzone" class="predict-dropzone" aria-label="Upload soil image">
+                        <div class="predict-dropzone-icon">📷</div>
+                        <div class="predict-dropzone-text">
+                            <h3>Drag &amp; drop a soil image</h3>
+                            <p>or <span class="predict-dropzone-browse">click to browse</span></p>
+                            <p class="predict-dropzone-meta">
+                                Optional: JPG, PNG. We will use normal detection over manual if uploaded.
+                            </p>
+                        </div>
+                        <label for="imageInput" class="predict-dropzone-overlay"></label>
+                    </div>
+
+                    <p class="validation-error" id="uploadError" role="alert" style="display:none;"></p>
+
+                    <div class="predict-preview-shell" id="previewShell" hidden>
+                        <div class="predict-preview-header">
+                            <span class="predict-preview-label">Selected image</span>
+                            <span class="predict-preview-filename" id="previewFilename"></span>
+                        </div>
+                        <div class="predict-preview-frame">
+                            <img id="preview" class="preview-img" alt="Preview of uploaded soil image">
+                        </div>
+                        <div style="margin-top: 10px; text-align:right;">
+                            <button type="button" id="clearImageBtn" class="shell-btn shell-btn-ghost" style="padding: 5px 10px; font-size:12px;">Clear Image</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="shell-btn shell-btn-primary predict-submit-btn" style="margin-top: 20px;">
+                        Get Recommendation
+                    </button>
+                </form>
+
+                <div class="result-box" id="resultsSection">
+                    {% if recommended_crops %}
+                    <div class="predict-result-card">
+                        <div class="predict-result-header">
+                            <div>
+                                <div class="predict-result-kicker">Result</div>
+                                <h3>Crop Recommendation</h3>
+                            </div>
+                            <div class="predict-result-pill" style="background:var(--am-color-green-100); color:var(--am-color-green-800);">
+                                AI insight
+                            </div>
+                        </div>
+                        <div class="predict-result-body">
+                            <p class="predict-result-row">
+                                <span class="predict-result-label">Detected Soil Type</span>
+                                <span class="predict-result-value" style="font-weight:600;">{{ detected_soil }}</span>
+                            </p>
+                            <p class="predict-result-row">
+                                <span class="predict-result-label">Recommended Crops</span>
+                                <span class="predict-result-value">
+                                    <ul style="margin:0; padding-left:20px;">
+                                        {% for crop in recommended_crops %}
+                                        <li>{{ crop }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </span>
+                            </p>
+                            <p class="predict-result-row">
+                                <span class="predict-result-label">Explanation</span>
+                                <span class="predict-result-value" style="font-size: 0.9em; line-height: 1.4;">{{ explanation }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="predict-result-placeholder">
+                        <div class="predict-result-placeholder-icon">🌱</div>
+                        <div>
+                            <h3>No recommendation yet</h3>
+                            <p>Fill out the form on the left to see crop recommendations here.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const previewShell = document.getElementById('previewShell');
+    const previewFilename = document.getElementById('previewFilename');
+    const dropzone = document.getElementById('uploadDropzone');
+    const clearImageBtn = document.getElementById('clearImageBtn');
+
+    function updatePreview(file) {
+        if (!file) {
+            clearPreview();
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.addEventListener('load', function() {
+            preview.src = this.result;
+            previewShell.hidden = false;
+        });
+
+        previewFilename.textContent = file.name;
+        reader.readAsDataURL(file);
+    }
+
+    function clearPreview() {
+        imageInput.value = '';
+        preview.src = '';
+        previewShell.hidden = true;
+        previewFilename.textContent = '';
+    }
+
+    if(clearImageBtn) {
+        clearImageBtn.addEventListener('click', clearPreview);
+    }
+
+    if (dropzone) {
+        ['dragenter', 'dragover'].forEach(evtName => {
+            dropzone.addEventListener(evtName, (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                dropzone.classList.add('is-dragover');
+            });
+        });
+
+        ['dragleave', 'dragend', 'drop'].forEach(evtName => {
+            dropzone.addEventListener(evtName, (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                dropzone.classList.remove('is-dragover');
+            });
+        });
+
+        dropzone.addEventListener('drop', (event) => {
+            const dt = event.dataTransfer;
+            if (!dt || !dt.files || !dt.files.length) return;
+            const file = dt.files[0];
+            if (validateFile(file)) {
+                imageInput.files = dt.files;
+                updatePreview(file);
+                clearUploadError();
+            }
+        });
+    }
+
+    var ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+    var MAX_SIZE_MB = 10;
+    var MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+    function validateFile(file) {
+        var errEl = document.getElementById('uploadError');
+        var dropEl = document.getElementById('uploadDropzone');
+        
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            showUploadError('Please upload a valid image file (JPG or PNG only).');
+            dropEl.classList.add('field-invalid');
+            return false;
+        }
+        if (file.size > MAX_SIZE_BYTES) {
+            showUploadError('File size must be less than ' + MAX_SIZE_MB + ' MB.');
+            dropEl.classList.add('field-invalid');
+            return false;
+        }
+        dropEl.classList.remove('field-invalid');
+        clearUploadError();
+        return true;
+    }
+
+    function showUploadError(msg) {
+        var err = document.getElementById('uploadError');
+        err.textContent = msg;
+        err.style.display = 'block';
+    }
+    function clearUploadError() {
+        var err = document.getElementById('uploadError');
+        err.textContent = '';
+        err.style.display = 'none';
+    }
+
+    document.getElementById('recommendForm').addEventListener('submit', function(e) {
+        if(imageInput.files.length > 0) {
+            var file = imageInput.files[0];
+            if (!validateFile(file)) {
+                e.preventDefault();
+            }
+        }
+    });
+
+    imageInput.addEventListener('change', function() {
+        var file = this.files[0];
+        if (file && validateFile(file)) {
+            updatePreview(file);
+        } else if (file) {
+            this.value = '';
+            previewShell.hidden = true;
+        }
+    });
+
+    {% if scroll_to_results %}
+    document.addEventListener("DOMContentLoaded", function() {
+        var results = document.getElementById("resultsSection");
+        if(results) {
+            results.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

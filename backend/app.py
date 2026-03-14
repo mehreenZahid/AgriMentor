@@ -7,7 +7,7 @@ from flask_login import LoginManager, login_required, current_user
 from flask_bcrypt import Bcrypt
 from authlib.integrations.flask_client import OAuth
 from config import Config
-from ml_utils import predict_image
+from ml_utils import predict_image, detect_soil_type_from_image, get_crop_recommendations
 from auth.routes import auth_bp
 from datetime import datetime
 
@@ -225,6 +225,68 @@ def upload():
         logger.exception("Upload or prediction failed")
         flash("Something went wrong while processing your image. Please try again.", "danger")
         return redirect(url_for("farmer_dashboard"))
+
+# ---------------------------------------------------
+# SOIL RECOMMENDATION (FARMER)
+# ---------------------------------------------------
+
+@app.route("/recommend")
+@login_required
+def recommend_entry():
+    if current_user.role != "farmer":
+        abort(403)
+    return redirect(url_for("soil_recommendation"))
+
+
+@app.route("/soil-recommendation", methods=["GET", "POST"])
+@login_required
+def soil_recommendation():
+    if current_user.role != "farmer":
+        abort(403)
+
+    if request.method == "POST":
+        soil_type = request.form.get("soil_type")
+        season = request.form.get("season")
+        water = request.form.get("water")
+
+        detected_soil = None
+
+        if "image" in request.files:
+            image = request.files["image"]
+            if image and image.filename != "" and _allowed_file(image.filename):
+                try:
+                    filename = secure_filename(image.filename)
+                    if not filename:
+                        filename = "soil_upload_" + str(int(datetime.now().timestamp())) + ".jpg"
+                    image_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                    image.save(image_path)
+                    
+                    detected_soil = detect_soil_type_from_image(image_path)
+                except Exception as ex:
+                    logger.exception("Soil image upload/detection failed")
+                    flash("Failed to process soil image. Using manual selection.", "danger")
+
+        if not detected_soil:
+            if soil_type:
+                detected_soil = soil_type
+            else:
+                detected_soil = "Loamy"
+
+        crops, explanation = get_crop_recommendations(detected_soil, season, water)
+        
+        return render_template(
+            "soil_recommendation.html",
+            detected_soil=detected_soil,
+            recommended_crops=crops,
+            explanation=explanation,
+            season=season,
+            water=water,
+            manual_soil_type=soil_type,
+            scroll_to_results=True
+        )
+
+    return render_template("soil_recommendation.html")
+
 
 # ---------------------------------------------------
 # EXPERT DASHBOARD
