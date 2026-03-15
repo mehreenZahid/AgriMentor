@@ -202,6 +202,14 @@ def upload():
         image.save(image_path)
 
         predicted_class, confidence = predict_image(image_path)
+        
+        confidence_threshold = 70.0
+        
+        if confidence < confidence_threshold:
+            return render_template(
+                "upload.html",
+                low_confidence=True
+            )
 
         query = """
         INSERT INTO uploads (image_name, upload_time, predicted_class, confidence, status, farmer_id)
@@ -274,6 +282,28 @@ def soil_recommendation():
 
         crops, explanation = get_crop_recommendations(detected_soil, season, water)
         
+        try:
+            crops_str = ", ".join(crops) if isinstance(crops, list) else str(crops)
+            cursor.execute('''
+                INSERT INTO soil_recommendations 
+                (user_id, soil_type, season, water, recommended_crops) 
+                VALUES (%s, %s, %s, %s, %s)
+            ''', (current_user.id, detected_soil, season, water, crops_str))
+            db.commit()
+        except Exception as ex:
+            logger.exception("Failed to insert soil recommendation into database")
+        
+        cursor.execute(
+            """
+            SELECT soil_type, season, water, recommended_crops, timestamp
+            FROM soil_recommendations
+            WHERE user_id = %s
+            ORDER BY timestamp DESC
+            LIMIT 5
+            """, (current_user.id,)
+        )
+        recent_soil_recommendations = cursor.fetchall()
+
         return render_template(
             "soil_recommendation.html",
             detected_soil=detected_soil,
@@ -282,10 +312,22 @@ def soil_recommendation():
             season=season,
             water=water,
             manual_soil_type=soil_type,
-            scroll_to_results=True
+            scroll_to_results=True,
+            recent_soil_recommendations=recent_soil_recommendations
         )
 
-    return render_template("soil_recommendation.html")
+    cursor.execute(
+        """
+        SELECT soil_type, season, water, recommended_crops, timestamp
+        FROM soil_recommendations
+        WHERE user_id = %s
+        ORDER BY timestamp DESC
+        LIMIT 5
+        """, (current_user.id,)
+    )
+    recent_soil_recommendations = cursor.fetchall()
+
+    return render_template("soil_recommendation.html", recent_soil_recommendations=recent_soil_recommendations)
 
 
 # ---------------------------------------------------
@@ -385,6 +427,8 @@ def dashboard():
         """, (current_user.id,)
     )
     recent_predictions = cursor.fetchall()
+
+
 
     # Agricultural schemes (if table exists)
     schemes = []

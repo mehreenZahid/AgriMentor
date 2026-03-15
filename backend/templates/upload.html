@@ -46,10 +46,9 @@
                     <div id="uploadDropzone" class="predict-dropzone" aria-label="Upload crop image">
                         <div class="predict-dropzone-icon">📷</div>
                         <div class="predict-dropzone-text">
-                            <h3>Drag &amp; drop a crop image</h3>
-                            <p>or <span class="predict-dropzone-browse">click to browse from your device</span></p>
+                            <h3>Click to browse and upload a crop leaf image</h3>
                             <p class="predict-dropzone-meta">
-                                Supported: JPG, JPEG, PNG &nbsp;·&nbsp; For leaves, fruits, stems, or soil close‑ups.
+                                Supported: JPG, JPEG, PNG &nbsp;·&nbsp; Please ensure the image is a clear crop leaf.
                             </p>
                         </div>
                         <label for="imageInput" class="predict-dropzone-overlay"></label>
@@ -62,7 +61,7 @@
 
                     <div class="predict-preview-shell" id="previewShell" hidden>
                         <div class="predict-preview-header">
-                            <span class="predict-preview-label">Selected image</span>
+                            <span class="predict-preview-label">Image selected – preview below</span>
                             <span class="predict-preview-filename" id="previewFilename"></span>
                         </div>
                         <div class="predict-preview-frame">
@@ -76,33 +75,50 @@
                 </form>
 
                 <div class="result-box">
-                    {% if prediction %}
-                    <div class="predict-result-card">
-                        <div class="predict-result-header">
-                            <div>
-                                <div class="predict-result-kicker">Latest prediction</div>
-                                <h3>Crop health analysis</h3>
+                    {% if low_confidence %}
+                        <div class="predict-result-card" style="border-left-color: #f59e0b;">
+                            <div class="predict-result-header">
+                                <div>
+                                    <div class="predict-result-kicker">Analysis Error</div>
+                                    <h3>Low Confidence</h3>
+                                </div>
+                                <div class="predict-result-pill" style="background: rgba(245,158,11,0.1); color: #d97706;">
+                                    Warning
+                                </div>
                             </div>
-                            <div class="predict-result-pill">
-                                AI insight
+                            <div class="predict-result-body">
+                                <p style="color: #4b5563; margin-top: 0.5rem; line-height: 1.5;">
+                                    The uploaded image may not be a crop leaf. Please upload a clear image of a plant leaf.
+                                </p>
                             </div>
                         </div>
-                        <div class="predict-result-body">
-                            <p class="predict-result-row">
-                                <span class="predict-result-label">Detected disease</span>
-                                <span class="predict-result-value">{{ prediction }}</span>
-                            </p>
-                            <p class="predict-result-row">
-                                <span class="predict-result-label">Model confidence</span>
-                                <span class="predict-result-value">
-                                    {{ confidence }}%
-                                </span>
+                    {% elif prediction %}
+                        <div class="predict-result-card">
+                            <div class="predict-result-header">
+                                <div>
+                                    <div class="predict-result-kicker">Latest prediction</div>
+                                    <h3>Crop health analysis</h3>
+                                </div>
+                                <div class="predict-result-pill">
+                                    AI insight
+                                </div>
+                            </div>
+                            <div class="predict-result-body">
+                                <p class="predict-result-row">
+                                    <span class="predict-result-label">Detected disease</span>
+                                    <span class="predict-result-value">{{ prediction }}</span>
+                                </p>
+                                <p class="predict-result-row">
+                                    <span class="predict-result-label">Model confidence</span>
+                                    <span class="predict-result-value">
+                                        {{ confidence }}%
+                                    </span>
+                                </p>
+                            </div>
+                            <p class="predict-result-footnote">
+                                This prediction is an AI‑generated suggestion and should be combined with field observations or agronomist advice before taking critical decisions.
                             </p>
                         </div>
-                        <p class="predict-result-footnote">
-                            This prediction is an AI‑generated suggestion and should be combined with field observations or agronomist advice before taking critical decisions.
-                        </p>
-                    </div>
                     {% else %}
                     <div class="predict-result-placeholder">
                         <div class="predict-result-placeholder-icon">🌱</div>
@@ -176,7 +192,7 @@
         var errEl = document.getElementById('uploadError');
         var dropEl = document.getElementById('uploadDropzone');
         if (!file) {
-            showUploadError('Please select an image to upload.');
+            showUploadError('Please upload a crop leaf image before running prediction.');
             dropEl.classList.add('field-invalid');
             return false;
         }
@@ -213,7 +229,7 @@
         dropEl.classList.remove('field-invalid');
         if (!file) {
             e.preventDefault();
-            showUploadError('Please select an image to upload.');
+            showUploadError('Please upload a crop leaf image before running prediction.');
             dropEl.classList.add('field-invalid');
             return;
         }
@@ -232,4 +248,5 @@
             previewShell.setAttribute('hidden', '');
         }
     });
+</script>
 {% endblock %}
