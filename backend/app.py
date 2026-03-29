@@ -7,7 +7,7 @@ from flask_login import LoginManager, login_required, current_user
 from flask_bcrypt import Bcrypt
 from authlib.integrations.flask_client import OAuth
 from config import Config
-from ml_utils import predict_image, detect_soil_type_from_image, get_crop_recommendations
+from ml_utils import predict_image, detect_soil_type_from_image, get_crop_recommendations, validate_plant_image
 from auth.routes import auth_bp
 from datetime import datetime
 
@@ -200,6 +200,13 @@ def upload():
             filename = "upload_" + str(int(datetime.now().timestamp())) + ".jpg"
         image_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
         image.save(image_path)
+
+        # Pre-validate if it's a plant/leaf image
+        if not validate_plant_image(image_path):
+            return render_template(
+                "upload.html",
+                low_confidence=True
+            )
 
         predicted_class, confidence = predict_image(image_path)
         

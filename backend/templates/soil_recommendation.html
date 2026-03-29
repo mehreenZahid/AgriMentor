@@ -7,27 +7,10 @@
     <div class="predict-shell">
         <div class="predict-card">
             <div class="predict-copy">
-                <h2>Get AI Crop Recommendations</h2>
+                <h2>Crop Recommendation Tool</h2>
                 <p class="predict-intro">
-                    Upload a picture of your soil or manually select its type. We'll recommend the best crops based on soil, season, and water availability.
+                    Select your soil type, season, and water availability. We'll recommend the best crops for your farm.
                 </p>
-
-                <div class="predict-guidance">
-                    <div class="predict-guidance-column">
-                        <h3>Soil Image tips (Optional)</h3>
-                        <ul>
-                            <li>Take a close-up photo of the soil surface.</li>
-                            <li>Ensure good natural lighting to capture the true color.</li>
-                            <li>Avoid debris like heavy leaf cover in the shot.</li>
-                        </ul>
-                    </div>
-                    <div class="predict-guidance-column">
-                        <h3>Manual entry</h3>
-                        <ul>
-                            <li>If no photo is uploaded, we'll use your manual soil selection.</li>
-                        </ul>
-                    </div>
-                </div>
 
                 <div class="predict-illustration">
                     <div class="predict-illustration-badge">Smart Farming</div>
@@ -37,66 +20,71 @@
             </div>
 
             <div class="predict-form">
-                <form action="/soil-recommendation" method="POST" enctype="multipart/form-data" class="predict-form-inner" id="recommendForm" novalidate>
+                <form action="/soil-recommendation" method="POST" class="predict-form-inner" id="recommendForm" novalidate>
                     
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label for="soil_type" style="display:block; font-weight:600; margin-bottom:8px;">Manual Soil Type (if no image uploaded)</label>
-                        <select name="soil_type" id="soil_type" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit;">
-                            <option value="Loamy" {% if manual_soil_type == 'Loamy' %}selected{% endif %}>Loamy</option>
-                            <option value="Sandy" {% if manual_soil_type == 'Sandy' %}selected{% endif %}>Sandy</option>
-                            <option value="Clay" {% if manual_soil_type == 'Clay' %}selected{% endif %}>Clay</option>
-                            <option value="Silt" {% if manual_soil_type == 'Silt' %}selected{% endif %}>Silt</option>
-                        </select>
+                    <!-- Hidden Inputs for Backend Logic -->
+                    <input type="hidden" name="soil_type" id="hidden_soil_type" value="{{ manual_soil_type or 'Loamy' }}">
+                    <input type="hidden" name="season" id="hidden_season" value="{{ season or 'Summer' }}">
+                    <input type="hidden" name="water" id="hidden_water" value="{{ water or 'Medium' }}">
+
+                    <!-- Soil Type Cards -->
+                    <div class="selection-section">
+                        <label class="section-label">Select Soil Type</label>
+                        <div class="card-grid" id="soilCards">
+                            <div class="selection-card {% if (manual_soil_type or 'Loamy') == 'Sandy' %}selected{% endif %}" data-group="soil_type" data-value="Sandy">
+                                <img src="{{ url_for('static', filename='images/soil/sandy.jpg') }}" alt="Sandy Soil" class="card-image">
+                                <div class="card-label">Sandy</div>
+                            </div>
+                            <div class="selection-card {% if (manual_soil_type or 'Loamy') == 'Clay' %}selected{% endif %}" data-group="soil_type" data-value="Clay">
+                                <img src="{{ url_for('static', filename='images/soil/clay.jpg') }}" alt="Clay Soil" class="card-image">
+                                <div class="card-label">Clay</div>
+                            </div>
+                            <div class="selection-card {% if (manual_soil_type or 'Loamy') == 'Loamy' %}selected{% endif %}" data-group="soil_type" data-value="Loamy">
+                                <img src="{{ url_for('static', filename='images/soil/loamy.jpg') }}" alt="Loamy Soil" class="card-image">
+                                <div class="card-label">Loamy</div>
+                            </div>
+                            <div class="selection-card {% if (manual_soil_type or 'Loamy') == 'Silt' %}selected{% endif %}" data-group="soil_type" data-value="Silt">
+                                <img src="{{ url_for('static', filename='images/soil/silt.jpg') }}" alt="Silt Soil" class="card-image">
+                                <div class="card-label">Silt</div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 20px; display: flex; gap: 10px;">
-                        <div style="flex: 1;">
-                            <label for="season" style="display:block; font-weight:600; margin-bottom:8px;">Season</label>
-                            <select name="season" id="season" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit;">
-                                <option value="Summer" {% if season == 'Summer' %}selected{% endif %}>Summer</option>
-                                <option value="Winter" {% if season == 'Winter' %}selected{% endif %}>Winter</option>
-                                <option value="Monsoon" {% if season == 'Monsoon' %}selected{% endif %}>Monsoon</option>
-                            </select>
-                        </div>
-                        <div style="flex: 1;">
-                            <label for="water" style="display:block; font-weight:600; margin-bottom:8px;">Water Availability</label>
-                            <select name="water" id="water" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit;">
-                                <option value="High" {% if water == 'High' %}selected{% endif %}>High</option>
-                                <option value="Medium" {% if water == 'Medium' %}selected{% endif %}>Medium</option>
-                                <option value="Low" {% if water == 'Low' %}selected{% endif %}>Low</option>
-                            </select>
+                    <!-- Season Cards -->
+                    <div class="selection-section">
+                        <label class="section-label">Select Season</label>
+                        <div class="card-grid" id="seasonCards">
+                            <div class="selection-card {% if (season or 'Summer') == 'Summer' %}selected{% endif %}" data-group="season" data-value="Summer">
+                                <img src="{{ url_for('static', filename='images/seasons/summer.jpg') }}" alt="Summer" class="card-image">
+                                <div class="card-label">Summer</div>
+                            </div>
+                            <div class="selection-card {% if (season or 'Summer') == 'Monsoon' %}selected{% endif %}" data-group="season" data-value="Monsoon">
+                                <img src="{{ url_for('static', filename='images/seasons/monsoon.jpg') }}" alt="Monsoon" class="card-image">
+                                <div class="card-label">Monsoon</div>
+                            </div>
+                            <div class="selection-card {% if (season or 'Summer') == 'Winter' %}selected{% endif %}" data-group="season" data-value="Winter">
+                                <img src="{{ url_for('static', filename='images/seasons/winter.jpg') }}" alt="Winter" class="card-image">
+                                <div class="card-label">Winter</div>
+                            </div>
                         </div>
                     </div>
 
-                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-                    
-                    <label style="display:block; font-weight:600; margin-bottom:8px;">Upload Soil Image (Optional)</label>
-                    <input type="file" name="image" id="imageInput" hidden accept=".jpg,.jpeg,.png">
-
-                    <div id="uploadDropzone" class="predict-dropzone" aria-label="Upload soil image">
-                        <div class="predict-dropzone-icon">📷</div>
-                        <div class="predict-dropzone-text">
-                            <h3>Drag &amp; drop a soil image</h3>
-                            <p>or <span class="predict-dropzone-browse">click to browse</span></p>
-                            <p class="predict-dropzone-meta">
-                                Optional: JPG, PNG. We will use normal detection over manual if uploaded.
-                            </p>
-                        </div>
-                        <label for="imageInput" class="predict-dropzone-overlay"></label>
-                    </div>
-
-                    <p class="validation-error" id="uploadError" role="alert" style="display:none;"></p>
-
-                    <div class="predict-preview-shell" id="previewShell" hidden>
-                        <div class="predict-preview-header">
-                            <span class="predict-preview-label">Selected image</span>
-                            <span class="predict-preview-filename" id="previewFilename"></span>
-                        </div>
-                        <div class="predict-preview-frame">
-                            <img id="preview" class="preview-img" alt="Preview of uploaded soil image">
-                        </div>
-                        <div style="margin-top: 10px; text-align:right;">
-                            <button type="button" id="clearImageBtn" class="shell-btn shell-btn-ghost" style="padding: 5px 10px; font-size:12px;">Clear Image</button>
+                    <!-- Water Availability Cards -->
+                    <div class="selection-section">
+                        <label class="section-label">Select Water Availability</label>
+                        <div class="card-grid" id="waterCards">
+                            <div class="selection-card {% if (water or 'Medium') == 'Low' %}selected{% endif %}" data-group="water" data-value="Low">
+                                <img src="{{ url_for('static', filename='images/water/low.jpg') }}" alt="Low Water" class="card-image">
+                                <div class="card-label">Low</div>
+                            </div>
+                            <div class="selection-card {% if (water or 'Medium') == 'Medium' %}selected{% endif %}" data-group="water" data-value="Medium">
+                                <img src="{{ url_for('static', filename='images/water/medium.jpg') }}" alt="Medium Water" class="card-image">
+                                <div class="card-label">Medium</div>
+                            </div>
+                            <div class="selection-card {% if (water or 'Medium') == 'High' %}selected{% endif %}" data-group="water" data-value="High">
+                                <img src="{{ url_for('static', filename='images/water/high.jpg') }}" alt="High Water" class="card-image">
+                                <div class="card-label">High</div>
+                            </div>
                         </div>
                     </div>
 
@@ -114,7 +102,7 @@
                                 <h3>Crop Recommendation</h3>
                             </div>
                             <div class="predict-result-pill" style="background:var(--am-color-green-100); color:var(--am-color-green-800);">
-                                AI insight
+                                Recommendation
                             </div>
                         </div>
                         <div class="predict-result-body">
@@ -190,130 +178,38 @@
 </div>
 
 <script>
-    const imageInput = document.getElementById('imageInput');
-    const preview = document.getElementById('preview');
-    const previewShell = document.getElementById('previewShell');
-    const previewFilename = document.getElementById('previewFilename');
-    const dropzone = document.getElementById('uploadDropzone');
-    const clearImageBtn = document.getElementById('clearImageBtn');
-
-    function updatePreview(file) {
-        if (!file) {
-            clearPreview();
-            return;
-        }
-
-        const reader = new FileReader();
-
-        reader.addEventListener('load', function() {
-            preview.src = this.result;
-            previewShell.hidden = false;
-        });
-
-        previewFilename.textContent = file.name;
-        reader.readAsDataURL(file);
-    }
-
-    function clearPreview() {
-        imageInput.value = '';
-        preview.src = '';
-        previewShell.hidden = true;
-        previewFilename.textContent = '';
-    }
-
-    if(clearImageBtn) {
-        clearImageBtn.addEventListener('click', clearPreview);
-    }
-
-    if (dropzone) {
-        ['dragenter', 'dragover'].forEach(evtName => {
-            dropzone.addEventListener(evtName, (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                dropzone.classList.add('is-dragover');
-            });
-        });
-
-        ['dragleave', 'dragend', 'drop'].forEach(evtName => {
-            dropzone.addEventListener(evtName, (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                dropzone.classList.remove('is-dragover');
-            });
-        });
-
-        dropzone.addEventListener('drop', (event) => {
-            const dt = event.dataTransfer;
-            if (!dt || !dt.files || !dt.files.length) return;
-            const file = dt.files[0];
-            if (validateFile(file)) {
-                imageInput.files = dt.files;
-                updatePreview(file);
-                clearUploadError();
-            }
-        });
-    }
-
-    var ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
-    var MAX_SIZE_MB = 10;
-    var MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-
-    function validateFile(file) {
-        var errEl = document.getElementById('uploadError');
-        var dropEl = document.getElementById('uploadDropzone');
-        
-        if (!ALLOWED_TYPES.includes(file.type)) {
-            showUploadError('Please upload a valid image file (JPG or PNG only).');
-            dropEl.classList.add('field-invalid');
-            return false;
-        }
-        if (file.size > MAX_SIZE_BYTES) {
-            showUploadError('File size must be less than ' + MAX_SIZE_MB + ' MB.');
-            dropEl.classList.add('field-invalid');
-            return false;
-        }
-        dropEl.classList.remove('field-invalid');
-        clearUploadError();
-        return true;
-    }
-
-    function showUploadError(msg) {
-        var err = document.getElementById('uploadError');
-        err.textContent = msg;
-        err.style.display = 'block';
-    }
-    function clearUploadError() {
-        var err = document.getElementById('uploadError');
-        err.textContent = '';
-        err.style.display = 'none';
-    }
-
-    document.getElementById('recommendForm').addEventListener('submit', function(e) {
-        if(imageInput.files.length > 0) {
-            var file = imageInput.files[0];
-            if (!validateFile(file)) {
-                e.preventDefault();
-            }
-        }
-    });
-
-    imageInput.addEventListener('change', function() {
-        var file = this.files[0];
-        if (file && validateFile(file)) {
-            updatePreview(file);
-        } else if (file) {
-            this.value = '';
-            previewShell.hidden = true;
-        }
-    });
-
-    {% if scroll_to_results %}
     document.addEventListener("DOMContentLoaded", function() {
+        const cards = document.querySelectorAll('.selection-card');
+        
+        cards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Get the group and value
+                const group = this.getAttribute('data-group');
+                const value = this.getAttribute('data-value');
+                
+                // Remove selected class from all cards in the same group
+                const groupCards = document.querySelectorAll(`.selection-card[data-group="${group}"]`);
+                groupCards.forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                
+                // Update corresponding hidden input
+                const hiddenInputId = `hidden_${group}`;
+                const hiddenInput = document.getElementById(hiddenInputId);
+                if (hiddenInput) {
+                    hiddenInput.value = value;
+                }
+            });
+        });
+
+        // Scroll to results if needed
+        {% if scroll_to_results %}
         var results = document.getElementById("resultsSection");
         if(results) {
             results.scrollIntoView({ behavior: 'smooth' });
         }
+        {% endif %}
     });
-    {% endif %}
 </script>
 {% endblock %}

@@ -6,7 +6,55 @@ import os
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "potato_transfer_model.h5")
 model = tf.keras.models.load_model(MODEL_PATH)
 
+# Initialize MobileNetV2 for pre-validation
+mobilenet_model = tf.keras.applications.MobileNetV2(weights='imagenet')
 
+def validate_plant_image(img_path):
+    """
+    Validates if an image contains a plant, leaf, or relevant agricultural context.
+    Uses MobileNetV2 pretrained on ImageNet.
+    """
+    try:
+        img = image.load_img(img_path, target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)
+        img_array = tf.keras.applications.mobilenet_v2.preprocess_input(img_array)
+        
+        preds = mobilenet_model.predict(img_array)
+        decoded_preds = tf.keras.applications.mobilenet_v2.decode_predictions(preds, top=5)[0]
+        
+        # Check against plant-related keywords
+        plant_keywords = [
+            'leaf', 'plant', 'tree', 'vegetation', 'flower', 'fruit', 
+            'crop', 'grass', 'daisy', 'vine', 'pot', 'corn', 'strawberry',
+            'apple', 'orange', 'lemon', 'banana', 'fig', 'pineapple', 
+            'mushroom', 'broccoli', 'cabbage', 'cauliflower', 'zucchini',
+            'cucumber', 'artichoke', 'bell_pepper', 'head_cabbage', 
+            'pomegranate', 'jackfruit', 'hip', 'ear', 'maize', 'buckeye',
+            'acorn', 'cardoon', 'zucchini', 'squash', 'rapeseed', 'hay'
+        ]
+        
+        print("\n===== VALIDATION DEBUG START =====")
+        print(f"Top 5 predictions for {os.path.basename(img_path)}:")
+        is_plant = False
+        for _, label, prob in decoded_preds:
+            label_lower = label.lower()
+            print(f"- {label}: {prob:.4f}")
+            for keyword in plant_keywords:
+                if keyword in label_lower:
+                    is_plant = True
+                    break
+            if is_plant:
+                break
+                
+        print(f"Is plant/leaf detected? {is_plant}")
+        print("===== VALIDATION DEBUG END =====\n")
+        
+        return is_plant
+    except Exception as e:
+        print(f"Validation error: {e}")
+        # Default to False if validation completely fails
+        return False
 
 
 # IMPORTANT: Paste your exact class list here
